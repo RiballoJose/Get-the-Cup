@@ -1,0 +1,22 @@
+Autores: 
+Darío Merino Díaz
+José Manuel Riballo Moreno
+
+Fuentes:
+https://github.com/RiballoJose/PacMan.git
+
+Binarios:
+https://www.dropbox.com/s/dejmut7wdgioaaw/PacMan-DarioMerino_JoseManuelRiballo.zip?dl=0
+
+Video:
+https://youtu.be/9ILVbzyJt1A
+
+Otra información:
+	Instrucciones:
+		- Durante el juego se puede cambiar la cámara mediante la tecla C.
+
+		- En la pantalla de créditos y records, pulsar ESCAPE para volver al menú.
+
+		- Durante el juego se puede poner en modo pausa mediante la tecla SPACE.
+
+		- La tecla ESCAPE permite salir al menú mientras se juega.
