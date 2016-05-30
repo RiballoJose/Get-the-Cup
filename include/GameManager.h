@@ -24,19 +24,13 @@
 #include <stack>
 #include <Ogre.h>
 #include <OgreSingleton.h>
-#include <OgreOverlaySystem.h>
-#include <OgreOverlayElement.h>
-#include <OgreTextAreaOverlayElement.h>
-#include <OgreOverlayManager.h>
 #include <OIS/OIS.h>
 
 #include "InputManager.h"
-#include "TrackManager.h"
-#include "SoundFXManager.h"
 
 class GameState;
 
-class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManager>, public OIS::KeyListener
+class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManager>, public OIS::KeyListener, public OIS::MouseListener
 {
  public:
   GameManager ();
@@ -54,18 +48,14 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   static GameManager& getSingleton ();
   static GameManager* getSingletonPtr ();
 
-  Ogre::OverlaySystem* getOverlaySystem() const { return _overlaySystem; }
-
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneManager;
   Ogre::RenderWindow* _renderWindow;
-  Ogre::OverlaySystem* _overlaySystem;
-  
+
   // Funciones de configuración.
   void loadResources ();
   bool configure ();
-  bool initSDL();
   
   // Heredados de FrameListener.
   bool frameStarted (const Ogre::FrameEvent& evt);
@@ -76,13 +66,15 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   // y ratón en el estado actual.
   bool keyPressed (const OIS::KeyEvent &e);
   bool keyReleased (const OIS::KeyEvent &e);
+
+  bool mouseMoved (const OIS::MouseEvent &e);
+  bool mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
+  bool mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   
   // Gestor de eventos de entrada.
   InputManager *_inputMgr;
   // Estados del juego.
   std::stack<GameState*> _states;
-  TrackManager* _pTrackManager;
-  SoundFXManager* _pSoundFXManager;
 };
 
 #endif

@@ -12,7 +12,7 @@ PauseState::enter ()
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->getViewport(0);
   // Nuevo background colour.
-  //_viewport->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0));
+  _viewport->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0));
 
   _exitGame = false;
 }
@@ -53,7 +53,7 @@ void
 PauseState::keyPressed
 (const OIS::KeyEvent &e) {
   // Tecla p --> Estado anterior.
-  if (e.key == OIS::KC_SPACE or e.key==OIS::KC_P) {
+  if (e.key == OIS::KC_P) {
     popState();
   }
 }
@@ -61,6 +61,24 @@ PauseState::keyPressed
 void
 PauseState::keyReleased
 (const OIS::KeyEvent &e)
+{
+}
+
+void
+PauseState::mouseMoved
+(const OIS::MouseEvent &e)
+{
+}
+
+void
+PauseState::mousePressed
+(const OIS::MouseEvent &e, OIS::MouseButtonID id)
+{
+}
+
+void
+PauseState::mouseReleased
+(const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
 }
 
