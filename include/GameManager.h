@@ -26,6 +26,10 @@
 #include <OgreSingleton.h>
 #include <OIS/OIS.h>
 
+#include <OgreOverlaySystem.h>
+#include <CEGUI.h>
+#include <RendererModules/Ogre/Renderer.h>
+
 #include "InputManager.h"
 
 class GameState;
@@ -52,7 +56,7 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneManager;
   Ogre::RenderWindow* _renderWindow;
-
+  CEGUI::OgreRenderer* _renderer; 
   // Funciones de configuración.
   void loadResources ();
   bool configure ();

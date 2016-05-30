@@ -125,7 +125,7 @@ GameManager::configure ()
     }
   }
   
-  _renderWindow = _root->initialise(true, "Game State Example");
+  _renderWindow = _root->initialise(true, "Get the Cup");
   
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
   
@@ -151,6 +151,7 @@ bool
 GameManager::frameStarted
 (const Ogre::FrameEvent& evt)
 {
+  
   _inputMgr->capture();
   return _states.top()->frameStarted(evt);
 }

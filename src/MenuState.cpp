@@ -8,11 +8,11 @@ MenuState::enter ()
 {
   _root = Ogre::Root::getSingletonPtr();
 
-  _sceneMgr = _root->createSceneManager(Ogre::ST_GENERIC, "SceneManager");
-  _camera = _sceneMgr->createCamera("MenuCamera");
+  _sceneMgr = _root->getSceneManager("SceneManager");
+  _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
-  _viewport->setBackgroundColour(Ogre::ColourValue(1.0, 1.0, 1.0));
-
+  _viewport->setBackgroundColour(Ogre::ColourValue(1.0, 0.0, 1.0));
+  createGUI();
   _exitGame = false;
 }
 
@@ -31,6 +31,30 @@ MenuState::pause ()
 void
 MenuState::resume ()
 {
+}
+
+void MenuState::createGUI()
+{
+  //CEGUI
+  _renderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  CEGUI::Scheme::setDefaultResourceGroup("Schemes");
+  CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
+  CEGUI::Font::setDefaultResourceGroup("Fonts");
+  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
+
+  CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
+  CEGUI::System::getSingleton().getDefaultGUIContext().setDefaultFont("DejaVuSans-12");
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
+
+  //Sheet
+  CEGUI::Window* sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Ex2");
+
+  //Config Window
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("configWin.layout");
+  //Attaching buttons
+  sheet->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(sheet);
 }
 
 bool

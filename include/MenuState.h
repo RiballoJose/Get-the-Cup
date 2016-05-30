@@ -43,6 +43,9 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
+  void createGUI();
+  void initUI();
+  
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 
@@ -55,7 +58,8 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   Ogre::SceneManager* _sceneMgr;
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
-
+  CEGUI::OgreRenderer* _renderer;
+  
   bool _exitGame;
 };
 
