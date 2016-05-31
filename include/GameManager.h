@@ -30,6 +30,9 @@
 #include <CEGUI.h>
 #include <RendererModules/Ogre/Renderer.h>
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+
 #include "InputManager.h"
 
 class GameState;
@@ -52,11 +55,14 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   static GameManager& getSingleton ();
   static GameManager* getSingletonPtr ();
 
+  Ogre::OverlaySystem* getOverlaySystem() const { return _overlaySystem; }
+
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneManager;
   Ogre::RenderWindow* _renderWindow;
   CEGUI::OgreRenderer* _renderer; 
+  Ogre::OverlaySystem* _overlaySystem;
   // Funciones de configuración.
   void loadResources ();
   bool configure ();

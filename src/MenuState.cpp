@@ -9,16 +9,21 @@ MenuState::enter ()
   _root = Ogre::Root::getSingletonPtr();
 
   _sceneMgr = _root->getSceneManager("SceneManager");
+  //_sceneMgr->addRenderQueueListener(GameManager::getSingletonPtr()->getOverlaySystem());
+  //_overlayManager = Ogre::OverlayManager::getSingletonPtr();
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
   _viewport->setBackgroundColour(Ogre::ColourValue(1.0, 0.0, 1.0));
   createGUI();
+  
   _exitGame = false;
 }
 
 void
 MenuState::exit()
 {
+  //_renderer->destroySystem();
+  _sheet->hide();
   _sceneMgr->clearScene();
   _root->getAutoCreatedWindow()->removeAllViewports();
 }
@@ -48,13 +53,16 @@ void MenuState::createGUI()
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
 
   //Sheet
-  CEGUI::Window* sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Ex2");
+  _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Ex2");
 
   //Config Window
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("configWin.layout");
+  CEGUI::Window* exitButton = configWin->getChild("ExitButton");
+  exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+   			     CEGUI::Event::Subscriber(&MenuState::quit, this));
   //Attaching buttons
-  sheet->addChild(configWin);
-  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(sheet);
+  _sheet->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
 }
 
 bool
@@ -96,20 +104,49 @@ MenuState::keyReleased
 
 void
 MenuState::mouseMoved
-(const OIS::MouseEvent &e)
+(const OIS::MouseEvent &evt)
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseMove(evt.state.X.rel, evt.state.Y.rel);  
 }
 
 void
 MenuState::mousePressed
-(const OIS::MouseEvent &e, OIS::MouseButtonID id)
+(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(id));
 }
 
 void
 MenuState::mouseReleased
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(id));
+}
+
+CEGUI::MouseButton MenuState::convertMouseButton(OIS::MouseButtonID id)
+{
+  CEGUI::MouseButton ceguiId;
+  switch(id)
+    {
+    case OIS::MB_Left:
+      ceguiId = CEGUI::LeftButton;
+      break;
+    case OIS::MB_Right:
+      ceguiId = CEGUI::RightButton;
+      break;
+    case OIS::MB_Middle:
+      ceguiId = CEGUI::MiddleButton;
+      break;
+    default:
+      ceguiId = CEGUI::LeftButton;
+    }
+  return ceguiId;
+}
+
+bool MenuState::quit(const CEGUI::EventArgs &e)
+{
+  _exitGame = true;
+  return true;
 }
 
 MenuState*
