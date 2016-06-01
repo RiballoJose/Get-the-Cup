@@ -90,13 +90,17 @@ MenuState::keyPressed
   // Espacio --> PlayState
   if (e.key == OIS::KC_SPACE) {
     changeState(PlayState::getSingletonPtr());
-  }
+  } 
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectChar(e.text);
+
 }
 
 void
 MenuState::keyReleased
 (const OIS::KeyEvent &e )
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
   if (e.key == OIS::KC_ESCAPE) {
     _exitGame = true;
   }
