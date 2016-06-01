@@ -41,7 +41,7 @@ MenuState::resume ()
 void MenuState::createGUI()
 {
   //CEGUI
-  _renderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  //_renderer = &CEGUI::OgreRenderer::bootstrapSystem();
   CEGUI::Scheme::setDefaultResourceGroup("Schemes");
   CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
   CEGUI::Font::setDefaultResourceGroup("Fonts");
@@ -56,7 +56,7 @@ void MenuState::createGUI()
   _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
 
   //Config Window
-  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("configWin.layout");
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("menu.layout");
   CEGUI::Window* playButton = configWin->getChild("PlayButton");
   playButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::play, this));
@@ -124,9 +124,9 @@ MenuState::keyPressed
 {
   // Transición al siguiente estado.
   // Espacio --> PlayState
-  if (e.key == OIS::KC_SPACE) {
+  /*if (e.key == OIS::KC_SPACE) {
     changeState(PlayState::getSingletonPtr());
-  } 
+    } */
   CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
   CEGUI::System::getSingleton().getDefaultGUIContext().injectChar(e.text);
 
@@ -137,9 +137,9 @@ MenuState::keyReleased
 (const OIS::KeyEvent &e )
 {
   CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
-  if (e.key == OIS::KC_ESCAPE) {
+  /*if (e.key == OIS::KC_ESCAPE) {
     _exitGame = true;
-  }
+    }*/
 }
 
 void

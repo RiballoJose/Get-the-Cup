@@ -43,9 +43,12 @@ GameManager::start
   // El GameManager es un FrameListener.
   _root->addFrameListener(this);
 
+  //Iniciamos CEGUI
+  _renderer = &CEGUI::OgreRenderer::bootstrapSystem();
+  
   // Transición al estado inicial.
   changeState(state);
-
+  
   // Bucle de rendering.
   _root->startRendering();
 }

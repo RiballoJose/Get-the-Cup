@@ -58,8 +58,8 @@ void
 PlayState::keyPressed
 (const OIS::KeyEvent &e)
 {
-  // Tecla p --> PauseState.
-  if (e.key == OIS::KC_P) {
+  
+  if (e.key == OIS::KC_P or e.key == OIS::KC_ESCAPE) {
     pushState(PauseState::getSingletonPtr());
   }
   CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
@@ -71,9 +71,6 @@ PlayState::keyReleased
 (const OIS::KeyEvent &e)
 {
   CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
-  if (e.key == OIS::KC_ESCAPE) {
-    _exitGame = true;
-  }
 }
 
 void

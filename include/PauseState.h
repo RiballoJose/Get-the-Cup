@@ -43,6 +43,16 @@ class PauseState : public Ogre::Singleton<PauseState>, public GameState
   void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
+  CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
+  void createGUI();
+  void initUI();
+  bool play(const CEGUI::EventArgs &e);
+  bool save(const CEGUI::EventArgs &e);
+  bool load(const CEGUI::EventArgs &e);
+  bool cfg(const CEGUI::EventArgs &e);
+  bool menu(const CEGUI::EventArgs &e);
+  bool quit(const CEGUI::EventArgs &e);
+  
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 
@@ -55,6 +65,8 @@ class PauseState : public Ogre::Singleton<PauseState>, public GameState
   Ogre::SceneManager* _sceneMgr;
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
+  
+  CEGUI::Window* _sheet;
 
   bool _exitGame;
 };
