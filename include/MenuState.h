@@ -43,6 +43,10 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
+  bool play(const CEGUI::EventArgs &e);
+  bool load(const CEGUI::EventArgs &e);
+  bool records(const CEGUI::EventArgs &e);
+  bool cfg(const CEGUI::EventArgs &e);
   bool quit(const CEGUI::EventArgs &e);
   
   void createGUI();

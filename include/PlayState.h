@@ -43,6 +43,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
+  CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
+  
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 

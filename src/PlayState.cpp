@@ -62,12 +62,15 @@ PlayState::keyPressed
   if (e.key == OIS::KC_P) {
     pushState(PauseState::getSingletonPtr());
   }
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectChar(e.text);
 }
 
 void
 PlayState::keyReleased
 (const OIS::KeyEvent &e)
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
   if (e.key == OIS::KC_ESCAPE) {
     _exitGame = true;
   }
@@ -75,22 +78,43 @@ PlayState::keyReleased
 
 void
 PlayState::mouseMoved
-(const OIS::MouseEvent &e)
+(const OIS::MouseEvent &evt)
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseMove(evt.state.X.rel, evt.state.Y.rel);  
 }
 
 void
 PlayState::mousePressed
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(id));
 }
 
 void
 PlayState::mouseReleased
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(id));
 }
-
+CEGUI::MouseButton PlayState::convertMouseButton(OIS::MouseButtonID id)
+{
+  CEGUI::MouseButton ceguiId;
+  switch(id)
+    {
+    case OIS::MB_Left:
+      ceguiId = CEGUI::LeftButton;
+      break;
+    case OIS::MB_Right:
+      ceguiId = CEGUI::RightButton;
+      break;
+    case OIS::MB_Middle:
+      ceguiId = CEGUI::MiddleButton;
+      break;
+    default:
+      ceguiId = CEGUI::LeftButton;
+    }
+  return ceguiId;
+}
 PlayState*
 PlayState::getSingletonPtr ()
 {

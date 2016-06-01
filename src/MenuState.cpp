@@ -53,16 +53,52 @@ void MenuState::createGUI()
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
 
   //Sheet
-  _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Ex2");
+  _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
 
   //Config Window
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("configWin.layout");
+  CEGUI::Window* playButton = configWin->getChild("PlayButton");
+  playButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::play, this));
+  CEGUI::Window* loadButton = configWin->getChild("LoadButton");
+  loadButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::load, this));
+  CEGUI::Window* recordsButton = configWin->getChild("RecordsButton");
+  recordsButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::records, this));
+  CEGUI::Window* cfgButton = configWin->getChild("CfgButton");
+  cfgButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::cfg, this));
   CEGUI::Window* exitButton = configWin->getChild("ExitButton");
   exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-   			     CEGUI::Event::Subscriber(&MenuState::quit, this));
+  CEGUI::Event::Subscriber(&MenuState::quit, this));
+
   //Attaching buttons
   _sheet->addChild(configWin);
   CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
+}
+
+bool MenuState::play(const CEGUI::EventArgs &e)
+{
+  changeState(PlayState::getSingletonPtr());
+  return true;
+}
+bool MenuState::load(const CEGUI::EventArgs &e)
+{
+  return true;
+}
+bool MenuState::records(const CEGUI::EventArgs &e)
+{
+  return true;
+}
+bool MenuState::cfg(const CEGUI::EventArgs &e)
+{
+  return true;
+}
+bool MenuState::quit(const CEGUI::EventArgs &e)
+{
+  _exitGame = true;
+  return true;
 }
 
 bool
@@ -146,13 +182,6 @@ CEGUI::MouseButton MenuState::convertMouseButton(OIS::MouseButtonID id)
     }
   return ceguiId;
 }
-
-bool MenuState::quit(const CEGUI::EventArgs &e)
-{
-  _exitGame = true;
-  return true;
-}
-
 MenuState*
 MenuState::getSingletonPtr ()
 {
