@@ -45,7 +45,15 @@ GameManager::start
 
   //Iniciamos CEGUI
   _renderer = &CEGUI::OgreRenderer::bootstrapSystem();
-  
+  CEGUI::Scheme::setDefaultResourceGroup("Schemes");
+  CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
+  CEGUI::Font::setDefaultResourceGroup("Fonts");
+  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
+
+  CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
+  CEGUI::System::getSingleton().getDefaultGUIContext().setDefaultFont("DejaVuSans-12");
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
   //Iniciamos SDL
   initSDL();
   _pTrackManager=new TrackManager();
@@ -162,7 +170,6 @@ bool
 GameManager::frameStarted
 (const Ogre::FrameEvent& evt)
 {
-  
   _inputMgr->capture();
   return _states.top()->frameStarted(evt);
 }

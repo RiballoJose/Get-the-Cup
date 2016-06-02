@@ -12,8 +12,6 @@ PauseState::enter ()
   _sceneMgr = _root->getSceneManager("SceneManager");
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->getViewport(0);
-  // Nuevo background colour.
-  //_viewport->setBackgroundColour(Ogre::ColourValue(0.0, 1.0, 0.0));
   createGUI();
   
   _exitGame = false;
@@ -37,17 +35,6 @@ PauseState::resume ()
 void PauseState::createGUI()
 {
   //CEGUI
-  CEGUI::Scheme::setDefaultResourceGroup("Schemes");
-  CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
-  CEGUI::Font::setDefaultResourceGroup("Fonts");
-  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
-  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
-
-  CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
-  CEGUI::System::getSingleton().getDefaultGUIContext().setDefaultFont("DejaVuSans-12");
-  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
-
-  //Sheet
   _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
 
   //Config Window

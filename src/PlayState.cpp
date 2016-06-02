@@ -12,12 +12,12 @@ PlayState::enter ()
   _sceneMgr = _root->getSceneManager("SceneManager");
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
-  
-  // Nuevo background colour.
-  //_viewport->setBackgroundColour(Ogre::ColourValue(1.0, 1.0, 1.0));
-  createScene();
+  _viewport->setClearEveryFrame(true);
+  _viewport->setOverlaysEnabled(false);
   initLights();
+  createScene();
   initBullet();
+  
   _exitGame = false;
 }
 
@@ -39,29 +39,32 @@ PlayState::pause()
 void
 PlayState::resume()
 {
-  // Se restaura el background colour.
-  //_viewport->setBackgroundColour(Ogre::ColourValue(0.0, 0.0, 0.0));
 }
 
 void
 PlayState::initLights()
 {
-  _light = _sceneMgr->createLight("Light");
   _sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
   _sceneMgr->setShadowColour(Ogre::ColourValue(0.5, 0.5, 0.5) );
   _sceneMgr->setAmbientLight(Ogre::ColourValue(0.9, 0.9, 0.9));
   _sceneMgr->setShadowTextureCount(2);
   _sceneMgr->setShadowTextureSize(512);
   
+  _light = _sceneMgr->createLight("Light");
+  _light->setPosition(-5, 12, 2);
   _light->setType(Ogre::Light::LT_SPOTLIGHT);
-  _light->setDirection(Ogre::Vector3(0,-1,0));
+  _light->setDirection(Ogre::Vector3(1,-1,0));
   _light->setSpotlightInnerAngle(Ogre::Degree(25.0f));
-  _light->setSpotlightOuterAngle(Ogre::Degree(200.0f));
-  _light->setPosition(0, 100, 0);
-  _light->setSpecularColour(0.8, 0.8, 0.8);
-  _light->setDiffuseColour(0.8, 0.8, 0.8);
-  _light->setSpotlightFalloff(5.0f);
+  _light->setSpotlightOuterAngle(Ogre::Degree(60.0f));
+  //_light->setSpecularColour(0.9, 0.9, 0.9);
+  //_light->setDiffuseColour(0.8, 0.8, 0.8);
+  _light->setSpotlightFalloff(0.0f);
   _light->setCastShadows(true);
+
+  _camera->setPosition(Ogre::Vector3(17, 16, -4));
+  _camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
+  _camera->setNearClipDistance(5);
+  _camera->setFOVy(Ogre::Degree(38));
 }
 
 void
@@ -118,12 +121,17 @@ PlayState::initBullet()
 void
 PlayState::createScene()
 {
-  _camera->setPosition(Ogre::Vector3(0, 42, 7));
-  _camera->lookAt(Ogre::Vector3(0, -50, 0));
   Ogre::SceneNode* nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode
-    ("Escenario", Ogre::Vector3(-0.5,0.0,3.0));
+    ("Escenario");//, Ogre::Vector3(-0.5,0.0,3.0));
   Ogre::Entity* ent = _sceneMgr->createEntity("Base.mesh");
+  ent->setCastShadows(true);
   nodo->attachObject(ent);
+
+  Ogre::SceneNode* nodo2 = nodo->createChildSceneNode
+    ("Muro");//, Ogre::Vector3(-0.5,0.0,3.0));
+  Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
+  ent2->setCastShadows(true);
+  nodo2->attachObject(ent2);
 }
 
 bool
