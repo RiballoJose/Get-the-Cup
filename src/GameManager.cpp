@@ -171,6 +171,10 @@ GameManager::keyPressed
 (const OIS::KeyEvent &e)
 {
   _states.top()->keyPressed(e);
+
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectChar(e.text);
+  
   return true;
 }
 
@@ -178,6 +182,9 @@ bool
 GameManager::keyReleased
 (const OIS::KeyEvent &e)
 {
+
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
+
   _states.top()->keyReleased(e);
   return true;
 }
@@ -186,6 +193,9 @@ bool
 GameManager::mouseMoved 
 (const OIS::MouseEvent &e)
 {
+
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseMove(e.state.X.rel, e.state.Y.rel);  
+
   _states.top()->mouseMoved(e);
   return true;
 }
@@ -194,6 +204,9 @@ bool
 GameManager::mousePressed 
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+
+    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(id));
+
   _states.top()->mousePressed(e, id);
   return true;
 }
@@ -202,6 +215,30 @@ bool
 GameManager::mouseReleased
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+
+      CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(id));
+
+      
   _states.top()->mouseReleased(e, id);
   return true;
+}
+
+CEGUI::MouseButton GameManager::convertMouseButton(OIS::MouseButtonID id)
+{
+  CEGUI::MouseButton ceguiId;
+  switch(id)
+    {
+    case OIS::MB_Left:
+      ceguiId = CEGUI::LeftButton;
+      break;
+    case OIS::MB_Right:
+      ceguiId = CEGUI::RightButton;
+      break;
+    case OIS::MB_Middle:
+      ceguiId = CEGUI::MiddleButton;
+      break;
+    default:
+      ceguiId = CEGUI::LeftButton;
+    }
+  return ceguiId;
 }

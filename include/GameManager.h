@@ -80,7 +80,10 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   bool mouseMoved (const OIS::MouseEvent &e);
   bool mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   bool mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
-  
+
+
+  CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
+
   // Gestor de eventos de entrada.
   InputManager *_inputMgr;
   // Estados del juego.

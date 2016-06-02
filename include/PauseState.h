@@ -43,9 +43,7 @@ class PauseState : public Ogre::Singleton<PauseState>, public GameState
   void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
 
-  CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
   void createGUI();
-  void initUI();
   bool play(const CEGUI::EventArgs &e);
   bool save(const CEGUI::EventArgs &e);
   bool load(const CEGUI::EventArgs &e);
