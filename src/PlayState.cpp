@@ -127,17 +127,48 @@ PlayState::createScene()
   ent->setCastShadows(true);
   nodo->attachObject(ent);
 
-  Ogre::SceneNode* nodo2 = nodo->createChildSceneNode
-    ("Muro");//, Ogre::Vector3(-0.5,0.0,3.0));
+  _player = nodo->createChildSceneNode
+    ("Muro", Ogre::Vector3(0.0,5.0,8.0));
   Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
   ent2->setCastShadows(true);
-  nodo2->attachObject(ent2);
+  _player->attachObject(_camera);
+  _player->attachObject(ent2);
+
+  // Creacion de la entidad y del SceneNode ------------------------
+  /*Ogre::Plane plane1(Vector3(0,1,0), 0);    // Normal y distancia
+  MeshManager::getSingleton().createPlane("p1",
+	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
+	200, 200, 1, 1, true, 1, 20, 20, Vector3::UNIT_Z);
+  Ogre::SceneNode* node = _sceneMgr->createSceneNode("ground");
+  Ogre::Entity* groundEnt = _sceneMgr->createEntity("planeEnt", "p1");
+  groundEnt->setMaterialName("Ground");
+  node->attachObject(groundEnt);
+  _sceneMgr->getRootSceneNode()->addChild(node);
+
+  // Creamos forma de colision para el plano ----------------------- 
+  OgreBulletCollisions::CollisionShape *Shape;
+  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
+    (Ogre::Vector3(0,1,0), 0);   // Vector normal y distancia
+  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
+    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
+
+  // Creamos la forma estatica (forma, Restitucion, Friccion) ------
+  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
+  
+  // Anadimos los objetos Shape y RigidBody ------------------------
+  //_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
 }
 
 bool
 PlayState::frameStarted
 (const Ogre::FrameEvent& evt)
 {
+  _camera->setAspectRatio
+    (Ogre::Real(_viewport->getActualWidth())/
+     Ogre::Real(_viewport->getActualHeight()));
+  Ogre::Vector3 movement(0, 0, 0);
+  Ogre::Vector3 direction = _player->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z;
+  direction.normalise();
   return true;
 }
 
