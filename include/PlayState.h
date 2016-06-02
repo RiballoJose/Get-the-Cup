@@ -23,6 +23,8 @@
 
 #include <Ogre.h>
 #include <OIS/OIS.h>
+#include <iostream>
+#include <btBulletDynamicsCommon.h>
 
 #include "GameState.h"
 
@@ -42,8 +44,6 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void mouseMoved (const OIS::MouseEvent &e);
   void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
   void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
-
-  CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
   
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
@@ -52,12 +52,24 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   static PlayState& getSingleton ();
   static PlayState* getSingletonPtr ();
 
+  void createScene();
+  void initLights();
+  void initBullet();
+
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneMgr;
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
+  Ogre::Light* _light;
 
+  // Inicialización elementos de la simulación -----------------
+  btBroadphaseInterface* _broadphase;
+  btDefaultCollisionConfiguration* _collisionConfiguration;
+  btCollisionDispatcher* _dispatcher;
+  btSequentialImpulseConstraintSolver* _solver;
+  btDiscreteDynamicsWorld* _dynamicsWorld;
+  
   bool _exitGame;
 };
 

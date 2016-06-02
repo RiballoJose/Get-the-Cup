@@ -46,6 +46,14 @@ GameManager::start
   //Iniciamos CEGUI
   _renderer = &CEGUI::OgreRenderer::bootstrapSystem();
   
+  //Iniciamos SDL
+  initSDL();
+  _pTrackManager=new TrackManager();
+  _pSoundFXManager=new SoundFXManager();
+  
+  //Iniciamos Overlays
+  //_overlaySystem = new Ogre::OverlaySystem();
+  
   // Transición al estado inicial.
   changeState(state);
   
@@ -171,7 +179,6 @@ GameManager::keyPressed
 (const OIS::KeyEvent &e)
 {
   _states.top()->keyPressed(e);
-
   CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
   CEGUI::System::getSingleton().getDefaultGUIContext().injectChar(e.text);
   
@@ -182,9 +189,7 @@ bool
 GameManager::keyReleased
 (const OIS::KeyEvent &e)
 {
-
   CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
-
   _states.top()->keyReleased(e);
   return true;
 }
@@ -193,9 +198,7 @@ bool
 GameManager::mouseMoved 
 (const OIS::MouseEvent &e)
 {
-
   CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseMove(e.state.X.rel, e.state.Y.rel);  
-
   _states.top()->mouseMoved(e);
   return true;
 }
@@ -204,9 +207,7 @@ bool
 GameManager::mousePressed 
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-
-    CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(id));
-
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(id));
   _states.top()->mousePressed(e, id);
   return true;
 }
@@ -215,10 +216,7 @@ bool
 GameManager::mouseReleased
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-
-      CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(id));
-
-      
+  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(id));
   _states.top()->mouseReleased(e, id);
   return true;
 }
@@ -241,4 +239,21 @@ CEGUI::MouseButton GameManager::convertMouseButton(OIS::MouseButtonID id)
       ceguiId = CEGUI::LeftButton;
     }
   return ceguiId;
+}
+bool GameManager::initSDL () {
+    // Inicializando SDL...
+  std::cout<<"Inicianzo SDL"<<std::endl;
+    if (SDL_Init(SDL_INIT_AUDIO) < 0)
+        return false;
+    // Llamar a  SDL_Quit al terminar.
+    atexit(SDL_Quit);
+
+    // Inicializando SDL mixer...
+    if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT,MIX_DEFAULT_CHANNELS, 4096) < 0)
+      return false;
+
+    // Llamar a Mix_CloseAudio al terminar.
+    atexit(Mix_CloseAudio);
+
+    return true;
 }

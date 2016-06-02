@@ -25,6 +25,7 @@
 #include <OIS/OIS.h>
 
 #include "GameState.h"
+#include "RecordManager.h"
 
 class MenuState : public Ogre::Singleton<MenuState>, public GameState
 {

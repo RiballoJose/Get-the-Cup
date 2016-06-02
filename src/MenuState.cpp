@@ -13,7 +13,7 @@ MenuState::enter ()
   //_overlayManager = Ogre::OverlayManager::getSingletonPtr();
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
-  _viewport->setBackgroundColour(Ogre::ColourValue(1.0, 0.0, 1.0));
+  //_viewport->setBackgroundColour(Ogre::ColourValue(1.0, 0.0, 1.0));
   createGUI();
   
   _exitGame = false;

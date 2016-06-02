@@ -30,10 +30,9 @@
 #include <CEGUI.h>
 #include <RendererModules/Ogre/Renderer.h>
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
-
 #include "InputManager.h"
+#include "TrackManager.h"
+#include "SoundFXManager.h"
 
 class GameState;
 
@@ -56,6 +55,7 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   static GameManager* getSingletonPtr ();
 
   Ogre::OverlaySystem* getOverlaySystem() const { return _overlaySystem; }
+  bool initSDL();
 
  protected:
   Ogre::Root* _root;
@@ -63,6 +63,8 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   Ogre::RenderWindow* _renderWindow;
   CEGUI::OgreRenderer* _renderer; 
   Ogre::OverlaySystem* _overlaySystem;
+  TrackManager* _pTrackManager;
+  SoundFXManager* _pSoundFXManager;
   // Funciones de configuración.
   void loadResources ();
   bool configure ();
