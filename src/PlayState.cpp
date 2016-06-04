@@ -1,32 +1,181 @@
 #include "PlayState.h"
 #include "PauseState.h"
-
+#include "MenuState.h"
 template<> PlayState* Ogre::Singleton<PlayState>::msSingleton = 0;
+
+using namespace Ogre::OverlayElementCommands;
 
 void
 PlayState::enter ()
 {
   _root = Ogre::Root::getSingletonPtr();
-
-  // Se recupera el gestor de escena y la cámara.
   _sceneMgr = _root->getSceneManager("SceneManager");
+  _sceneMgr->addRenderQueueListener(GameManager::getSingletonPtr()->getOverlaySystem());
+  
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
-  _viewport->setClearEveryFrame(true);
-  _viewport->setOverlaysEnabled(false);
-  initLights();
+  _light = _sceneMgr->createLight("Light");
+
+  _numBall = 0;
+  _fuerza = MIN_FUERZA;
+
+  std::cout << "0" << std::endl;
   createScene();
-  initBullet();
+
+  createInitialWorld();
   
+
   _exitGame = false;
 }
 
 void
+PlayState::createScene()
+{
+  Ogre::Entity* ent = NULL;
+  Ogre::SceneNode* nodo = NULL;
+  std::stringstream bloq, material;
+  bloq.str("");
+
+
+ /* _mainTrack = _pTrackManager->load("Background.ogg");
+  _simpleEffect = _pSoundFXManager->load("Efecto.ogg");*/ 
+
+  std::cout << "1" << std::endl;
+  _perspective = 0;
+  _camera->setPosition(Ogre::Vector3(-10, 25, 80));
+  _camera->lookAt(Ogre::Vector3(3, 0, 5));
+
+  _sceneMgr->setSkyDome(true, "Sky", 5, 8);
+
+
+
+/* Cáñon */
+  _nodBase = _sceneMgr->getRootSceneNode()->createChildSceneNode(
+    "Base", Ogre::Vector3(-5, 0.001, 45));
+  ent = _sceneMgr->createEntity("Cannion_Base.mesh");
+  _nodBase->attachObject(ent);
+
+  _nodCannion = _nodBase->createChildSceneNode("Cannion", 
+    Ogre::Vector3(0, 1, 0));
+  ent = _sceneMgr->createEntity("Cannion.mesh");
+  _nodCannion->attachObject(ent);
+
+  _nodShoot = _nodCannion->createChildSceneNode("Disparo",
+    Ogre::Vector3(0, 1.7, -2));
+
+  /* Fisica */
+  _debugDrawer = new OgreBulletCollisions::DebugDrawer();
+  _debugDrawer->setDrawWireframe(true);  
+  nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(
+    "debugNode", Ogre::Vector3::ZERO);
+  nodo->attachObject(static_cast<Ogre::SimpleRenderable *>(_debugDrawer));
+
+  Ogre::AxisAlignedBox worldBounds = Ogre::AxisAlignedBox (
+    Ogre::Vector3 (-10000, -10000, -10000), 
+    Ogre::Vector3 (10000,  10000,  10000));
+  Ogre::Vector3 gravity = Ogre::Vector3(0, -9.8, 0);
+
+  _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
+     worldBounds, gravity);
+  _world->setDebugDrawer (_debugDrawer);
+  _world->setShowDebugShapes (false);  // Muestra los collision shapes
+
+  
+
+ 
+  _sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
+  _sceneMgr->setShadowColour(Ogre::ColourValue(0.5, 0.5, 0.5) );
+  _sceneMgr->setAmbientLight(Ogre::ColourValue(0.9, 0.9, 0.9));
+  _sceneMgr->setShadowTextureCount(2);
+  _sceneMgr->setShadowTextureSize(512);
+  
+  _light->setType(Ogre::Light::LT_SPOTLIGHT);
+  _light->setDirection(Ogre::Vector3(0,-1,0));
+  _light->setSpotlightInnerAngle(Ogre::Degree(25.0f));
+  _light->setSpotlightOuterAngle(Ogre::Degree(200.0f));
+  _light->setPosition(0, 150, 0);
+  _light->setSpecularColour(0.8, 0.8, 0.8);
+  _light->setDiffuseColour(0.8, 0.8, 0.8);
+  _light->setSpotlightFalloff(5.0f);
+  _light->setCastShadows(true);
+}
+
+void PlayState::createInitialWorld() {
+  
+
+ /* Creacion de la entidad y del SceneNode */
+  Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+  Ogre::MeshManager::getSingleton().createPlane("p1",
+  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
+  500, 500, 1, 1, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
+  Ogre::SceneNode* node = _sceneMgr->createSceneNode("Ground");
+  Ogre::Entity* groundEnt = _sceneMgr->createEntity("Base", "p1");
+  groundEnt->setCastShadows(false);
+  groundEnt->setMaterialName("Ground");
+  node->attachObject(groundEnt);
+  _sceneMgr->getRootSceneNode()->addChild(node);
+
+  std::cout << "2" << std::endl;
+
+  /* Creamos forma de colision para el plano */ 
+  OgreBulletCollisions::CollisionShape *Shape;
+  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
+    (Ogre::Vector3::UNIT_Y, 0);
+  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
+    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
+
+  /* Creamos la forma estatica (forma, Restitucion, Friccion) */
+  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
+  
+  /* Anadimos los objetos Shape y RigidBody */
+  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
+
+  
+  std::cout << "3" << std::endl;
+}
+
+void PlayState::shoot(){
+  Ogre::Entity* entity=NULL;
+  Ogre::SceneNode* node=NULL;
+  Ogre::Vector3 pos = Ogre::Vector3::ZERO;
+  
+  pos = _nodShoot->_getDerivedPosition();
+
+  entity = _sceneMgr->createEntity("ball" + Ogre::StringConverter::toString(_numBall), "ball.mesh");
+  node = _sceneMgr->getRootSceneNode()->
+    createChildSceneNode();
+  node->attachObject(entity);
+
+  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL; 
+  OgreBulletCollisions::CollisionShape *bodyShape = NULL;
+  OgreBulletDynamics::RigidBody *rigidBody = NULL;
+
+  trimeshConverter = new 
+    OgreBulletCollisions::StaticMeshToShapeConverter(entity);
+  bodyShape = trimeshConverter->createConvex();
+
+  rigidBody = new OgreBulletDynamics::RigidBody("rigidBody" + Ogre::StringConverter::toString(_numBall), _world);
+
+  rigidBody->setShape(node, bodyShape,
+         0.6 /* Restitucion */, 0.6 /* Friccion */,
+         5.0 /* Masa */, pos /* Posicion inicial */,
+         Ogre::Quaternion::IDENTITY /* Orientacion */);
+
+  rigidBody->setLinearVelocity(_dir * _fuerza);
+
+  _numBall++;
+
+  _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
+
+  std::cout << "4" << std::endl;
+
+}
+
+
+void
 PlayState::exit ()
 {
-  delete _dynamicsWorld; delete _solver;
-  delete _collisionConfiguration;
-  delete _dispatcher; delete _broadphase;
+
   _sceneMgr->clearScene();
   _root->getAutoCreatedWindow()->removeAllViewports();
 }
@@ -39,146 +188,77 @@ PlayState::pause()
 void
 PlayState::resume()
 {
-}
-
-void
-PlayState::initLights()
-{
-  _sceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_MODULATIVE);
-  _sceneMgr->setShadowColour(Ogre::ColourValue(0.5, 0.5, 0.5) );
-  _sceneMgr->setAmbientLight(Ogre::ColourValue(0.9, 0.9, 0.9));
-  _sceneMgr->setShadowTextureCount(2);
-  _sceneMgr->setShadowTextureSize(512);
-  
-  _light = _sceneMgr->createLight("Light");
-  _light->setPosition(-5, 12, 2);
-  _light->setType(Ogre::Light::LT_SPOTLIGHT);
-  _light->setDirection(Ogre::Vector3(1,-1,0));
-  _light->setSpotlightInnerAngle(Ogre::Degree(25.0f));
-  _light->setSpotlightOuterAngle(Ogre::Degree(60.0f));
-  //_light->setSpecularColour(0.9, 0.9, 0.9);
-  //_light->setDiffuseColour(0.8, 0.8, 0.8);
-  _light->setSpotlightFalloff(0.0f);
-  _light->setCastShadows(true);
-
-  _camera->setPosition(Ogre::Vector3(17, 16, -4));
-  _camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
-  _camera->setNearClipDistance(5);
-  _camera->setFOVy(Ogre::Degree(38));
-}
-
-void
-PlayState::initBullet()
-{
-  _broadphase = new btDbvtBroadphase();
-  _collisionConfiguration = new btDefaultCollisionConfiguration();
-  _dispatcher = new btCollisionDispatcher(_collisionConfiguration);
-  _solver = new btSequentialImpulseConstraintSolver;
-  _dynamicsWorld = new btDiscreteDynamicsWorld(_dispatcher,_broadphase,
-					       _solver,_collisionConfiguration);
-
-  // Definicion de las propiedades del mundo -------------------
-  _dynamicsWorld->setGravity(btVector3(0,-10,0));
-
-  // Creacion de las formas de colision ------------------------
-  /*btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),1);
-  btCollisionShape* fallShape = new btSphereShape(1);
-
-  // Definicion de los cuerpos rigidos en la escena ------------
-  btDefaultMotionState* groundMotionState = new btDefaultMotionState
-    (btTransform(btQuaternion(0,0,0,1), btVector3(0,-1,0)));
-  btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI
-    (0,groundMotionState,groundShape,btVector3(0,0,0));
-  btRigidBody* gRigidBody = new btRigidBody(groundRigidBodyCI);
-  _dynamicsWorld->addRigidBody(gRigidBody);
-
-  btDefaultMotionState* fallMotionState = new btDefaultMotionState
-    (btTransform(btQuaternion(0,0,0,1), btVector3(0,50,0)));
-  btScalar mass = 1;
-  btVector3 fallInertia(0,0,0);
-  fallShape->calculateLocalInertia(mass,fallInertia);
-  btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI
-    (mass,fallMotionState,fallShape,fallInertia);
-  btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
-  _dynamicsWorld->addRigidBody(fallRigidBody);
-
-  // Bucle principal de la simulacion --------------------------
-  for (int i=0 ; i<300 ; i++) {
-    _dynamicsWorld->stepSimulation(1/60.f,10);
-    btTransform trans;
-    fallRigidBody->getMotionState()->getWorldTransform(trans);
-    std::cout << "Altura: " << trans.getOrigin().getY() << std::endl;
-  }
-
-  // Finalizacion (limpieza) -----------------------------------
-  _dynamicsWorld->removeRigidBody(fallRigidBody);
-  delete fallRigidBody->getMotionState(); delete fallRigidBody;
-  _dynamicsWorld->removeRigidBody(gRigidBody);
-  delete gRigidBody->getMotionState(); delete gRigidBody;
-  delete fallShape; delete groundShape;*/
-}
-
-void
-PlayState::createScene()
-{
-  Ogre::SceneNode* nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode
-    ("Escenario");//, Ogre::Vector3(-0.5,0.0,3.0));
-  Ogre::Entity* ent = _sceneMgr->createEntity("Base.mesh");
-  ent->setCastShadows(true);
-  nodo->attachObject(ent);
-
-  _player = nodo->createChildSceneNode
-    ("Muro", Ogre::Vector3(0.0,5.0,8.0));
-  Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
-  ent2->setCastShadows(true);
-  _player->attachObject(_camera);
-  _player->attachObject(ent2);
-
-  // Creacion de la entidad y del SceneNode ------------------------
-  /*Ogre::Plane plane1(Vector3(0,1,0), 0);    // Normal y distancia
-  MeshManager::getSingleton().createPlane("p1",
-	ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
-	200, 200, 1, 1, true, 1, 20, 20, Vector3::UNIT_Z);
-  Ogre::SceneNode* node = _sceneMgr->createSceneNode("ground");
-  Ogre::Entity* groundEnt = _sceneMgr->createEntity("planeEnt", "p1");
-  groundEnt->setMaterialName("Ground");
-  node->attachObject(groundEnt);
-  _sceneMgr->getRootSceneNode()->addChild(node);
-
-  // Creamos forma de colision para el plano ----------------------- 
-  OgreBulletCollisions::CollisionShape *Shape;
-  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
-    (Ogre::Vector3(0,1,0), 0);   // Vector normal y distancia
-  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
-    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
-
-  // Creamos la forma estatica (forma, Restitucion, Friccion) ------
-  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
-  
-  // Anadimos los objetos Shape y RigidBody ------------------------
-  //_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
+  if(_exitGame){changeState(MenuState::getSingletonPtr());}
 }
 
 bool
 PlayState::frameStarted
 (const Ogre::FrameEvent& evt)
 {
-  _camera->setAspectRatio
-    (Ogre::Real(_viewport->getActualWidth())/
-     Ogre::Real(_viewport->getActualHeight()));
-  Ogre::Vector3 movement(0, 0, 0);
-  Ogre::Vector3 direction = _player->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z;
-  direction.normalise();
+  _deltaT = evt.timeSinceLastFrame;
+
+  if(!_exitGame){
+    /* Movimiento del cañon */
+    if(_derecha && _nodBase->getOrientation().zAxis().x > (-0.95)){
+      _nodBase->yaw(Ogre::Degree(-180 * _deltaT));
+    } else if(_izquierda && _nodBase->getOrientation().zAxis().x < (0.95)){
+      _nodBase->yaw(Ogre::Degree(180 * _deltaT));
+    } else if(_arriba && _nodCannion->getOrientation().zAxis().y > (-0.5)){
+      _nodCannion->pitch(Ogre::Degree(180 * _deltaT));
+    } else if(_abajo && _nodCannion->getOrientation().zAxis().y < (0.15)){
+      _nodCannion->pitch(Ogre::Degree((-180) * _deltaT));
+    }
+   }
+
+    /* Calculo de la direccion del disparo */
+    _dir = _nodBase->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z;
+    _dir.y = (_nodCannion->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z).y;
+
+    /* Incremento de la fuerza de disparo */
+    if(_shoot && (_fuerza <= MAX_FUERZA)){
+      _fuerza += INC_FUERZA;
+    }
+
+  if(!_exitGame){
+  }
+  else{return false;}
   return true;
 }
+
+
+void
+PlayState::destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
+{
+   if(!node) return;
+
+   Ogre::SceneNode::ObjectIterator itObject = node->getAttachedObjectIterator();
+
+   while (itObject.hasMoreElements()){
+      node->getCreator()->destroyMovableObject(itObject.getNext());
+   }
+
+   Ogre::SceneNode::ChildNodeIterator itChild = node->getChildIterator();
+
+   while (itChild.hasMoreElements()){
+      Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+      destroyAllAttachedMovableObjects(pChildNode);
+   }
+}
+
 
 bool
 PlayState::frameEnded
 (const Ogre::FrameEvent& evt)
 {
-  if (_exitGame)
-    return false;
+  _deltaT = evt.timeSinceLastFrame;
+  _world->stepSimulation(_deltaT);
   
+  if (_exitGame){
+    //std::cout << _score << std::endl;
+    EndState::getSingletonPtr()->addScore(_score);
+    pushState(EndState::getSingletonPtr());
+    //return false;
+  }
   return true;
 }
 
@@ -186,33 +266,74 @@ void
 PlayState::keyPressed
 (const OIS::KeyEvent &e)
 {
-  if (e.key == OIS::KC_P or e.key == OIS::KC_ESCAPE) {
+  switch(e.key){
+  case OIS::KC_P:
     pushState(PauseState::getSingletonPtr());
+    break;
+  case OIS::KC_ESCAPE://overlay?
+    break;
+  case OIS::KC_C:
+      _perspective = (_perspective+1) % 2;
+      switch(_perspective){
+      case 0:
+	//Vista aerea
+	_camera->setPosition(Ogre::Vector3(0, 42, 7));
+	_camera->lookAt(Ogre::Vector3(0, -50, 0));
+	break;
+      case 1:
+	//vista 3D
+	_camera->setPosition(Ogre::Vector3(0, 32, 37));
+	_camera->lookAt(Ogre::Vector3(0, 0, 0));
+	break;
+      }
+      break;
+case OIS::KC_RIGHT:
+		_derecha = true;
+		break;
+	case OIS::KC_LEFT:
+		_izquierda = true;
+		break;
+	case OIS::KC_UP:
+		_arriba = true;
+		break;
+	case OIS::KC_DOWN:
+		_abajo = true;
+		break;
+	case OIS::KC_SPACE:
+		_shoot = true;
+		break;
+  default:
+    break;
   }
 }
-
 void
 PlayState::keyReleased
 (const OIS::KeyEvent &e)
 {
-}
-
-void
-PlayState::mouseMoved
-(const OIS::MouseEvent &evt)
-{
-}
-
-void
-PlayState::mousePressed
-(const OIS::MouseEvent &e, OIS::MouseButtonID id)
-{
-}
-
-void
-PlayState::mouseReleased
-(const OIS::MouseEvent &e, OIS::MouseButtonID id)
-{
+  switch(e.key){
+  	case OIS::KC_RIGHT:
+      _derecha = false;
+      break;
+    case OIS::KC_LEFT:
+      _izquierda = false;
+      break;
+    case OIS::KC_UP:
+      _arriba = false;
+      break;
+    case OIS::KC_DOWN:
+      _abajo = false;
+      break;
+    case OIS::KC_SPACE:
+      _shoot = false;
+      shoot();
+      _fuerza = MIN_FUERZA;
+      break;
+  case OIS::KC_ESCAPE:
+    _exitGame = true;
+    break;
+  default:
+    break;
+  }
 }
 
 PlayState*
@@ -227,3 +348,5 @@ PlayState::getSingleton ()
   assert(msSingleton);
   return *msSingleton;
 }
+
+

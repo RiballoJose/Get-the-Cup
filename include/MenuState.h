@@ -40,21 +40,9 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   void keyPressed (const OIS::KeyEvent &e);
   void keyReleased (const OIS::KeyEvent &e);
 
-  void mouseMoved (const OIS::MouseEvent &e);
-  void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
-  void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
-  
-  void createGUI();
-  bool play(const CEGUI::EventArgs &e);
-  bool load(const CEGUI::EventArgs &e);
-  bool records(const CEGUI::EventArgs &e);
-  bool cfg(const CEGUI::EventArgs &e);
-  bool quit(const CEGUI::EventArgs &e);
-  
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
-
-  // Heredados de Ogre::Singleton.
+  void showRecords ();
   static MenuState& getSingleton ();
   static MenuState* getSingletonPtr ();
 
@@ -63,11 +51,24 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   Ogre::SceneManager* _sceneMgr;
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
-  
-  CEGUI::Window* _sheet;
+
   Ogre::OverlayManager* _overlayManager;
-    
-  bool _exitGame;
+  Ogre::Overlay *_ovCreditos;
+
+
+
+ private:
+
+  int _sel;
+
+  Ogre::SceneNode* _nodo;
+  Ogre::SceneNode** _opciones;
+  Ogre::Overlay* _ovRecords;
+
+  void createScene();
+  void createOverlay();
+  void menuActions();
+  bool _exitGame, _op;
 };
 
 #endif

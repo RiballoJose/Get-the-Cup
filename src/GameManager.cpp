@@ -2,6 +2,8 @@
 
 #include "GameManager.h"
 #include "GameState.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 template<> GameManager* Ogre::Singleton<GameManager>::msSingleton = 0;
 
@@ -27,7 +29,10 @@ GameManager::start
 {
   // Creación del objeto Ogre::Root.
   _root = new Ogre::Root();
-  
+  initSDL();
+  _overlaySystem = new Ogre::OverlaySystem();
+  _pTrackManager=new TrackManager();
+  _pSoundFXManager=new SoundFXManager();
   loadResources();
 
   if (!configure())
@@ -38,33 +43,13 @@ GameManager::start
 
   // Registro como key y mouse listener...
   _inputMgr->addKeyListener(this, "GameManager");
-  _inputMgr->addMouseListener(this, "GameManager");
 
   // El GameManager es un FrameListener.
   _root->addFrameListener(this);
 
-  //Iniciamos CEGUI
-  _renderer = &CEGUI::OgreRenderer::bootstrapSystem();
-  CEGUI::Scheme::setDefaultResourceGroup("Schemes");
-  CEGUI::ImageManager::setImagesetDefaultResourceGroup("Imagesets");
-  CEGUI::Font::setDefaultResourceGroup("Fonts");
-  CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
-  CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
-
-  CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
-  CEGUI::System::getSingleton().getDefaultGUIContext().setDefaultFont("DejaVuSans-12");
-  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
-  //Iniciamos SDL
-  initSDL();
-  _pTrackManager=new TrackManager();
-  _pSoundFXManager=new SoundFXManager();
-  
-  //Iniciamos Overlays
-  //_overlaySystem = new Ogre::OverlaySystem();
-  
   // Transición al estado inicial.
   changeState(state);
-  
+
   // Bucle de rendering.
   _root->startRendering();
 }
@@ -144,7 +129,7 @@ GameManager::configure ()
     }
   }
   
-  _renderWindow = _root->initialise(true, "Get the Cup");
+  _renderWindow = _root->initialise(true, "Pac-Man");
   
   Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
   
@@ -186,9 +171,6 @@ GameManager::keyPressed
 (const OIS::KeyEvent &e)
 {
   _states.top()->keyPressed(e);
-  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyDown(static_cast<CEGUI::Key::Scan>(e.key));
-  CEGUI::System::getSingleton().getDefaultGUIContext().injectChar(e.text);
-  
   return true;
 }
 
@@ -196,57 +178,10 @@ bool
 GameManager::keyReleased
 (const OIS::KeyEvent &e)
 {
-  CEGUI::System::getSingleton().getDefaultGUIContext().injectKeyUp(static_cast<CEGUI::Key::Scan>(e.key));
   _states.top()->keyReleased(e);
   return true;
 }
 
-bool
-GameManager::mouseMoved 
-(const OIS::MouseEvent &e)
-{
-  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseMove(e.state.X.rel, e.state.Y.rel);  
-  _states.top()->mouseMoved(e);
-  return true;
-}
-
-bool
-GameManager::mousePressed 
-(const OIS::MouseEvent &e, OIS::MouseButtonID id)
-{
-  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonDown(convertMouseButton(id));
-  _states.top()->mousePressed(e, id);
-  return true;
-}
-
-bool
-GameManager::mouseReleased
-(const OIS::MouseEvent &e, OIS::MouseButtonID id)
-{
-  CEGUI::System::getSingleton().getDefaultGUIContext().injectMouseButtonUp(convertMouseButton(id));
-  _states.top()->mouseReleased(e, id);
-  return true;
-}
-
-CEGUI::MouseButton GameManager::convertMouseButton(OIS::MouseButtonID id)
-{
-  CEGUI::MouseButton ceguiId;
-  switch(id)
-    {
-    case OIS::MB_Left:
-      ceguiId = CEGUI::LeftButton;
-      break;
-    case OIS::MB_Right:
-      ceguiId = CEGUI::RightButton;
-      break;
-    case OIS::MB_Middle:
-      ceguiId = CEGUI::MiddleButton;
-      break;
-    default:
-      ceguiId = CEGUI::LeftButton;
-    }
-  return ceguiId;
-}
 bool GameManager::initSDL () {
     // Inicializando SDL...
   std::cout<<"Inicianzo SDL"<<std::endl;

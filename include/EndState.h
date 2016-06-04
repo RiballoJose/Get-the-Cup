@@ -25,14 +25,27 @@ class EndState : public Ogre::Singleton<EndState>, public GameState{
   static EndState& getSingleton ();
   static EndState* getSingletonPtr ();
 
+  void addScore(int score);
+
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneMgr;
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
+  Ogre::OverlayManager* _overlayManager;
+
+  Ogre::Overlay *_principal;
+  Ogre::OverlayElement *_o_name, *_o_score, **_punteros;
+
+  Record *_rec;
         
  private:
+  void createOverlay();
+
+  int _pos;
   bool _endGame;
+  std::string _score;
+  static char _name[3];
 };
 
 #endif

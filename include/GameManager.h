@@ -24,11 +24,11 @@
 #include <stack>
 #include <Ogre.h>
 #include <OgreSingleton.h>
-#include <OIS/OIS.h>
-
 #include <OgreOverlaySystem.h>
-#include <CEGUI.h>
-#include <RendererModules/Ogre/Renderer.h>
+#include <OgreOverlayElement.h>
+#include <OgreTextAreaOverlayElement.h>
+#include <OgreOverlayManager.h>
+#include <OIS/OIS.h>
 
 #include "InputManager.h"
 #include "TrackManager.h"
@@ -36,7 +36,7 @@
 
 class GameState;
 
-class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManager>, public OIS::KeyListener, public OIS::MouseListener
+class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManager>, public OIS::KeyListener
 {
  public:
   GameManager ();
@@ -55,19 +55,17 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   static GameManager* getSingletonPtr ();
 
   Ogre::OverlaySystem* getOverlaySystem() const { return _overlaySystem; }
-  bool initSDL();
 
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneManager;
   Ogre::RenderWindow* _renderWindow;
-  CEGUI::OgreRenderer* _renderer; 
   Ogre::OverlaySystem* _overlaySystem;
-  TrackManager* _pTrackManager;
-  SoundFXManager* _pSoundFXManager;
+  
   // Funciones de configuración.
   void loadResources ();
   bool configure ();
+  bool initSDL();
   
   // Heredados de FrameListener.
   bool frameStarted (const Ogre::FrameEvent& evt);
@@ -78,18 +76,13 @@ class GameManager : public Ogre::FrameListener, public Ogre::Singleton<GameManag
   // y ratón en el estado actual.
   bool keyPressed (const OIS::KeyEvent &e);
   bool keyReleased (const OIS::KeyEvent &e);
-
-  bool mouseMoved (const OIS::MouseEvent &e);
-  bool mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
-  bool mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
-
-
-  CEGUI::MouseButton convertMouseButton(OIS::MouseButtonID id);
-
+  
   // Gestor de eventos de entrada.
   InputManager *_inputMgr;
   // Estados del juego.
   std::stack<GameState*> _states;
+  TrackManager* _pTrackManager;
+  SoundFXManager* _pSoundFXManager;
 };
 
 #endif
