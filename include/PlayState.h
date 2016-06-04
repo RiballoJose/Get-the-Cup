@@ -21,30 +21,23 @@
 #ifndef PlayState_H
 #define PlayState_H
 
-#define MAX_FUERZA 40.0
-#define MIN_FUERZA 10.0
-#define INC_FUERZA 0.75
-
 #include <Ogre.h>
 #include <OIS/OIS.h>
-#include <cstdlib>
-
+#include <iostream>
+#include <btBulletDynamicsCommon.h>
 #include <OgreBulletDynamicsRigidBody.h>
-
+#include <Shapes/OgreBulletCollisionsStaticPlaneShape.h>
 #include <Shapes/OgreBulletCollisionsBoxShape.h>
 #include <Shapes/OgreBulletCollisionsConvexHullShape.h>
-#include <Shapes/OgreBulletCollisionsStaticPlaneShape.h>
 #include <Shapes/OgreBulletCollisionsTrimeshShape.h>
-
 #include <Utils/OgreBulletCollisionsMeshToShapeConverter.h> 
 
-#include <btBulletDynamicsCommon.h>
+
+using namespace Ogre;
+using namespace OgreBulletCollisions;
+using namespace OgreBulletDynamics;
 
 #include "GameState.h"
-#include "EndState.h"
-#include "TrackManager.h"
-#include "SoundFXManager.h"
-
 
 class PlayState : public Ogre::Singleton<PlayState>, public GameState
 {
@@ -59,6 +52,10 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void keyPressed (const OIS::KeyEvent &e);
   void keyReleased (const OIS::KeyEvent &e);
 
+  void mouseMoved (const OIS::MouseEvent &e);
+  void mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id);
+  void mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id);
+  
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 
@@ -67,12 +64,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   static PlayState* getSingletonPtr ();
 
   void createScene();
-  void pacmanMove();
-  void destroyAllAttachedMovableObjects(Ogre::SceneNode* node);
-  void removeScene();
-  void createOverlay();
-  void createInitialWorld();
-  void shoot();
+  void initLights();
+  void initBullet();
 
  protected:
   Ogre::Root* _root;
@@ -81,37 +74,16 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Camera* _camera;
   Ogre::Light* _light;
 
-
-  bool _exitGame, _derecha, _arriba, _abajo, _izquierda, _shoot;
-
-  int _perspective, _score, _numBall;
-
-
-  float _fuerza;
-
-  Ogre::Real _deltaT;
-  
-  Ogre::OverlayManager* _overlayManager;
-  Ogre::Overlay *_ovJuego;
-  Ogre::OverlayElement *_ovPunt, *_ovVida, *_ovScore;
-
-  TrackPtr _mainTrack;
-  SoundFXPtr _simpleEffect;
-  TrackManager* _pTrackManager;
-  SoundFXManager* _pSoundFXManager;
-
-  Ogre::AnimationState *_animState;
-
+  // Inicialización elementos de la simulación -----------------
   OgreBulletDynamics::DynamicsWorld * _world;
   OgreBulletCollisions::DebugDrawer * _debugDrawer;
 
   std::deque <OgreBulletDynamics::RigidBody *>         _bodies;
   std::deque <OgreBulletCollisions::CollisionShape *>  _shapes;
-
-  Ogre::SceneNode *_nodCannion, *_nodBase, *_nodShoot;
-
-  Ogre::Vector3 _dir, _duckMove;
   
+  Ogre::SceneNode* _player;
+  
+  bool _exitGame;
 };
 
 #endif

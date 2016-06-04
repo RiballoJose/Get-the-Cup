@@ -1,0 +1,13 @@
+Autores: 
+Darío Merino Díaz
+José Manuel Riballo Moreno
+
+Fuentes:
+https://github.com/RiballoJose/Get-the-Cup
+
+Binarios:
+
+Video:
+
+Otra información:
+	Instrucciones:
