@@ -47,6 +47,7 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   void createGUI();
   bool play(const CEGUI::EventArgs &e);
   bool load(const CEGUI::EventArgs &e);
+  bool help(const CEGUI::EventArgs &e);
   bool records(const CEGUI::EventArgs &e);
   bool cfg(const CEGUI::EventArgs &e);
   bool quit(const CEGUI::EventArgs &e);

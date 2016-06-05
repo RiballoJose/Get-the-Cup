@@ -51,6 +51,10 @@ void MenuState::createGUI()
   CEGUI::Window* loadButton = configWin->getChild("LoadButton");
   loadButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::load, this));
+
+  CEGUI::Window* helpButton = configWin->getChild("HelpButton");
+  helpButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::help, this));
   
   CEGUI::Window* recordsButton = configWin->getChild("RecordsButton");
   recordsButton->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -76,6 +80,17 @@ bool MenuState::play(const CEGUI::EventArgs &e)
 }
 bool MenuState::load(const CEGUI::EventArgs &e)
 {
+  return true;
+}
+bool MenuState::help(const CEGUI::EventArgs &e)
+{
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("help.layout");
+  _cfg = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+  CEGUI::Window* exitButton = configWin->getChild("ExitButton");
+  exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::back, this));
+  _cfg->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_cfg);
   return true;
 }
 bool MenuState::records(const CEGUI::EventArgs &e)
