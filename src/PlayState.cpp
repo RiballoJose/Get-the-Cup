@@ -77,6 +77,33 @@ PlayState::initBullet()
   Ogre::SceneNode* node=NULL;
   Ogre::Vector3 pos = Ogre::Vector3(3,5.0,8.0);
 
+  /* Creacion de la entidad y del SceneNode */
+  Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+  Ogre::MeshManager::getSingleton().createPlane("p1",
+  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
+  500, 500, 1, 1, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
+  node = _sceneMgr->createSceneNode("Ground");
+  Ogre::Entity* groundEnt = _sceneMgr->createEntity("Base", "p1");
+  groundEnt->setCastShadows(false);
+  groundEnt->setMaterialName("Ground");
+  node->attachObject(groundEnt);
+  _sceneMgr->getRootSceneNode()->addChild(node);
+
+  /* Creamos forma de colision para el plano */ 
+  OgreBulletCollisions::CollisionShape *Shape;
+  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
+    (Ogre::Vector3::UNIT_Y, 0);
+  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
+    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
+
+  /* Creamos la forma estatica (forma, Restitucion, Friccion) */
+  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
+  
+  /* Anadimos los objetos Shape y RigidBody */
+  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
+
+  std::cout << "2" << std::endl;
+
   entity = _sceneMgr->createEntity("cube" + Ogre::StringConverter::toString(num), "Muro_tex.mesh");
   node = _sceneMgr->getRootSceneNode()->
     createChildSceneNode();
@@ -96,19 +123,7 @@ PlayState::initBullet()
 
   _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
 
-  /* Creacion de la entidad y del SceneNode */
- /* Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
-  Ogre::MeshManager::getSingleton().createPlane("p1",
-  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
-  500, 500, 1, 1, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
-  Ogre::SceneNode* node = _sceneMgr->createSceneNode("Ground");
-  Ogre::Entity* groundEnt = _sceneMgr->createEntity("Base", "p1");
-  groundEnt->setCastShadows(false);
-  groundEnt->setMaterialName("Ground");
-  node->attachObject(groundEnt);
-  _sceneMgr->getRootSceneNode()->addChild(node);
-
-  std::cout << "2" << std::endl;*/
+  
 
   /* Creamos forma de colision para el plano */ 
  /* OgreBulletCollisions::CollisionShape *Shape;
@@ -171,13 +186,9 @@ void
 PlayState::createScene()
 {
 
-  Ogre::SceneNode* nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode
-    ("Escenario");//, Ogre::Vector3(-0.5,0.0,3.0));
-  Ogre::Entity* ent = _sceneMgr->createEntity("Base.mesh");
-  ent->setCastShadows(true);
-  nodo->attachObject(ent);
+  Ogre::SceneNode* nodo = NULL;
 
-  _player = nodo->createChildSceneNode
+  _player = _sceneMgr->getRootSceneNode()->createChildSceneNode
     ("Muro", Ogre::Vector3(0.0,5.0,8.0));
   Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
   ent2->setCastShadows(true);
