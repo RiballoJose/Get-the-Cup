@@ -105,9 +105,9 @@ PlayState::initBullet()
   std::cout << "2" << std::endl;
 
   entity = _sceneMgr->createEntity("cube" + Ogre::StringConverter::toString(num), "Muro_tex.mesh");
-  node = _sceneMgr->getRootSceneNode()->
+  _player = _sceneMgr->getRootSceneNode()->
     createChildSceneNode();
-  node->attachObject(entity);
+  _player->attachObject(entity);
 
 
   trimeshConverter = new 
@@ -116,7 +116,7 @@ PlayState::initBullet()
 
   rigidBody = new OgreBulletDynamics::RigidBody("rigidBody" + Ogre::StringConverter::toString(num), _world);
 
-  rigidBody->setShape(node, bodyShape,
+  rigidBody->setShape(_player, bodyShape,
          0.6 /* Restitucion */, 0.6 /* Friccion */,
          5.0 /* Masa */, pos /* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
@@ -188,12 +188,12 @@ PlayState::createScene()
 
   Ogre::SceneNode* nodo = NULL;
 
-  _player = _sceneMgr->getRootSceneNode()->createChildSceneNode
+  nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode
     ("Muro", Ogre::Vector3(0.0,5.0,8.0));
   Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
   ent2->setCastShadows(true);
-  _player->attachObject(_camera);
-  _player->attachObject(ent2);
+  nodo->attachObject(_camera);
+  nodo->attachObject(ent2);
 
    /* Fisica */
   _debugDrawer = new OgreBulletCollisions::DebugDrawer();
@@ -246,6 +246,8 @@ PlayState::frameStarted
   Ogre::Vector3 movement(0, 0, 0);
   Ogre::Vector3 direction = _player->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z;
   direction.normalise();
+
+
   return true;
 }
 
@@ -265,8 +267,13 @@ void
 PlayState::keyPressed
 (const OIS::KeyEvent &e)
 {
-  if (e.key == OIS::KC_P or e.key == OIS::KC_ESCAPE) {
+  switch(e.key){
+  case OIS::KC_P:
     pushState(PauseState::getSingletonPtr());
+    break;
+  case OIS::KC_SPACE:
+    //_player->translate(0,2,0);
+    break;
   }
 }
 
