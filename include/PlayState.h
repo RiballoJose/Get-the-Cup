@@ -74,6 +74,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Camera* _camera;
   Ogre::Light* _light;
 
+  Ogre::Real _deltaT;
+
   // Inicialización elementos de la simulación -----------------
   OgreBulletDynamics::DynamicsWorld * _world;
   OgreBulletCollisions::DebugDrawer * _debugDrawer;

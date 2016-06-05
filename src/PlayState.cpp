@@ -67,9 +67,37 @@ PlayState::initLights()
 void
 PlayState::initBullet()
 {
+  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL; 
+  OgreBulletCollisions::CollisionShape *bodyShape = NULL;
+  OgreBulletDynamics::RigidBody *rigidBody = NULL;
+
+  int num = 1;
+
+  Ogre::Entity* entity=NULL;
+  Ogre::SceneNode* node=NULL;
+  Ogre::Vector3 pos = Ogre::Vector3(3,5.0,8.0);
+
+  entity = _sceneMgr->createEntity("cube" + Ogre::StringConverter::toString(num), "Muro_tex.mesh");
+  node = _sceneMgr->getRootSceneNode()->
+    createChildSceneNode();
+  node->attachObject(entity);
+
+
+  trimeshConverter = new 
+    OgreBulletCollisions::StaticMeshToShapeConverter(entity);
+  bodyShape = trimeshConverter->createConvex();
+
+  rigidBody = new OgreBulletDynamics::RigidBody("rigidBody" + Ogre::StringConverter::toString(num), _world);
+
+  rigidBody->setShape(node, bodyShape,
+         0.6 /* Restitucion */, 0.6 /* Friccion */,
+         5.0 /* Masa */, pos /* Posicion inicial */,
+         Ogre::Quaternion::IDENTITY /* Orientacion */);
+
+  _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
 
   /* Creacion de la entidad y del SceneNode */
-  Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+ /* Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
   500, 500, 1, 1, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
@@ -80,20 +108,20 @@ PlayState::initBullet()
   node->attachObject(groundEnt);
   _sceneMgr->getRootSceneNode()->addChild(node);
 
-  std::cout << "2" << std::endl;
+  std::cout << "2" << std::endl;*/
 
   /* Creamos forma de colision para el plano */ 
-  OgreBulletCollisions::CollisionShape *Shape;
+ /* OgreBulletCollisions::CollisionShape *Shape;
   Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
     (Ogre::Vector3::UNIT_Y, 0);
   OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
     OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
 
   /* Creamos la forma estatica (forma, Restitucion, Friccion) */
-  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
+  //rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
   
   /* Anadimos los objetos Shape y RigidBody */
-  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
+  //_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
   /*_broadphase = new btDbvtBroadphase();
   std::cout << "1" << std::endl;
   _collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -131,7 +159,7 @@ PlayState::initBullet()
     fallRigidBody->getMotionState()->getWorldTransform(trans);
     std::cout << "Altura: " << trans.getOrigin().getY() << std::endl;
   }
-  // Finalizacion (limpieza) -----------------------------------
+  //Finalizacion (limpieza) -----------------------------------
   _dynamicsWorld->removeRigidBody(fallRigidBody);
   delete fallRigidBody->getMotionState(); delete fallRigidBody;
   _dynamicsWorld->removeRigidBody(gRigidBody);
@@ -200,6 +228,7 @@ bool
 PlayState::frameStarted
 (const Ogre::FrameEvent& evt)
 {
+  _deltaT = evt.timeSinceLastFrame;
   _camera->setAspectRatio
     (Ogre::Real(_viewport->getActualWidth())/
      Ogre::Real(_viewport->getActualHeight()));
@@ -213,6 +242,8 @@ bool
 PlayState::frameEnded
 (const Ogre::FrameEvent& evt)
 {
+  _deltaT = evt.timeSinceLastFrame;
+  _world->stepSimulation(_deltaT);
   if (_exitGame)
     return false;
   
