@@ -22,7 +22,7 @@ void
 MenuState::exit()
 {
   //_renderer->destroySystem();
-  _sheet->hide();
+  _menu->hide();
   _sceneMgr->clearScene();
   _root->getAutoCreatedWindow()->removeAllViewports();
 }
@@ -40,29 +40,33 @@ MenuState::resume ()
 void MenuState::createGUI()
 {
   //CEGUI
-  _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+  _menu = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
 
   //Config Window
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("menu.layout");
   CEGUI::Window* playButton = configWin->getChild("PlayButton");
   playButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::play, this));
+  
   CEGUI::Window* loadButton = configWin->getChild("LoadButton");
   loadButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::load, this));
+  
   CEGUI::Window* recordsButton = configWin->getChild("RecordsButton");
   recordsButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::records, this));
+  
   CEGUI::Window* cfgButton = configWin->getChild("CfgButton");
   cfgButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::cfg, this));
+  
   CEGUI::Window* exitButton = configWin->getChild("ExitButton");
   exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::quit, this));
 
   //Attaching buttons
-  _sheet->addChild(configWin);
-  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
+  _menu->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_menu);
 }
 
 bool MenuState::play(const CEGUI::EventArgs &e)
@@ -80,11 +84,41 @@ bool MenuState::records(const CEGUI::EventArgs &e)
 }
 bool MenuState::cfg(const CEGUI::EventArgs &e)
 {
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("cfg.layout");
+  _cfg = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+  CEGUI::Window* exitButton = configWin->getChild("ExitButton");
+  exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::back, this));
+  CEGUI::Window* applyButton = configWin->getChild("ApplyButton");
+  applyButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::apply, this));
+  _cfg->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_cfg);
   return true;
 }
 bool MenuState::quit(const CEGUI::EventArgs &e)
 {
   _exitGame = true;
+  return true;
+}
+
+bool MenuState::back(const CEGUI::EventArgs &e)
+{
+  //_cfg->hide();
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_menu);
+  return true;
+}
+
+bool MenuState::apply(const CEGUI::EventArgs &e)
+{
+  std::ifstream file("ogre.cfg");
+  std::string str;
+  if(file.is_open()){
+    for(int i = 0; i < 9; i++)
+      getline(file,str);
+    
+    std::cout << str << std::endl;
+  }
   return true;
 }
 

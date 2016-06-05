@@ -50,7 +50,9 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   bool records(const CEGUI::EventArgs &e);
   bool cfg(const CEGUI::EventArgs &e);
   bool quit(const CEGUI::EventArgs &e);
-  
+  bool back(const CEGUI::EventArgs &e);
+  bool apply(const CEGUI::EventArgs &e);
+
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 
@@ -64,7 +66,7 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
   
-  CEGUI::Window* _sheet;
+  CEGUI::Window* _menu,* _cfg;
   Ogre::OverlayManager* _overlayManager;
     
   bool _exitGame;
