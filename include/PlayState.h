@@ -24,7 +24,6 @@
 #include <Ogre.h>
 #include <OIS/OIS.h>
 #include <iostream>
-#include <btBulletDynamicsCommon.h>
 #include <OgreBulletDynamicsRigidBody.h>
 #include <Shapes/OgreBulletCollisionsStaticPlaneShape.h>
 #include <Shapes/OgreBulletCollisionsBoxShape.h>
@@ -80,10 +79,12 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   OgreBulletDynamics::DynamicsWorld * _world;
   OgreBulletCollisions::DebugDrawer * _debugDrawer;
 
+
   std::deque <OgreBulletDynamics::RigidBody *>         _bodies;
   std::deque <OgreBulletCollisions::CollisionShape *>  _shapes;
   
   Ogre::SceneNode* _player;
+  OgreBulletDynamics::RigidBody *_player_rb;
   
   bool _exitGame;
 };

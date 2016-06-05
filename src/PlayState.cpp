@@ -114,14 +114,14 @@ PlayState::initBullet()
     OgreBulletCollisions::StaticMeshToShapeConverter(entity);
   bodyShape = trimeshConverter->createConvex();
 
-  rigidBody = new OgreBulletDynamics::RigidBody("rigidBody" + Ogre::StringConverter::toString(num), _world);
+  _player_rb = new OgreBulletDynamics::RigidBody("rigidBody" + Ogre::StringConverter::toString(num), _world);
 
-  rigidBody->setShape(_player, bodyShape,
+  _player_rb->setShape(_player, bodyShape,
          0.6 /* Restitucion */, 0.6 /* Friccion */,
          5.0 /* Masa */, pos /* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
-  _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
+  _shapes.push_back(bodyShape);   _bodies.push_back(_player_rb);
 
   
 
@@ -240,6 +240,7 @@ PlayState::frameStarted
 (const Ogre::FrameEvent& evt)
 {
   _deltaT = evt.timeSinceLastFrame;
+  _world->stepSimulation(_deltaT);
   _camera->setAspectRatio
     (Ogre::Real(_viewport->getActualWidth())/
      Ogre::Real(_viewport->getActualHeight()));
@@ -272,8 +273,9 @@ PlayState::keyPressed
     pushState(PauseState::getSingletonPtr());
     break;
   case OIS::KC_SPACE:
-    //_player->translate(0,2,0);
     break;
+  default:
+  break;
   }
 }
 
