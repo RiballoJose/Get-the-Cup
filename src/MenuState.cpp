@@ -86,6 +86,8 @@ bool MenuState::help(const CEGUI::EventArgs &e)
 {
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("help.layout");
   _cfg = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+  CEGUI::Window* helpText = configWin->getChild("HelpText");
+  helpText->setText("El objetivo de Get the Cup es llevar a tu\nequipo hasta lo mas alto, y para ello\ndeberas guiar su escudo a traves de niveles y plataformas.\nEn ellas encontraras obstaculos y rivales\nque querran impedir tus exitos. Tendras\nque evitarlos!Puedes controlar a tu\npersonaje con las siguientes instrucciones:");
   CEGUI::Window* exitButton = configWin->getChild("ExitButton");
   exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::back, this));
