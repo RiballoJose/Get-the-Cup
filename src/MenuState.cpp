@@ -13,6 +13,8 @@ MenuState::enter ()
   //_overlayManager = Ogre::OverlayManager::getSingletonPtr();
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
+
   createGUI();
   
   _exitGame = false;
@@ -35,6 +37,7 @@ MenuState::pause ()
 void
 MenuState::resume ()
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
 }
 
 void MenuState::createGUI()

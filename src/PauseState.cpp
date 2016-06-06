@@ -13,7 +13,7 @@ PauseState::enter ()
   _camera = _sceneMgr->getCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->getViewport(0);
   createGUI();
-  
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
   _exitGame = false;
 }
 

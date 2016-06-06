@@ -14,6 +14,7 @@ PlayState::enter ()
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
   _viewport->setClearEveryFrame(true);
   _viewport->setOverlaysEnabled(false);
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
   initLights();
   createScene();
   initBullet();
@@ -36,6 +37,7 @@ PlayState::pause()
 void
 PlayState::resume()
 {
+  CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
 }
 
 void
@@ -109,10 +111,9 @@ PlayState::initBullet()
     createChildSceneNode();
   _player->attachObject(entity);
   
-  _camera->setPosition(0.0, 0.0, 0.0);
   _player->attachObject(_camera);
-  _camera->setPosition(Ogre::Vector3(17, 16, -4));
-  _camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
+  _camera->setPosition(Ogre::Vector3(8, 4, 0));
+  _camera->lookAt(Ogre::Vector3(0.0, 5.0, 0.0));
 
   trimeshConverter = new 
     OgreBulletCollisions::StaticMeshToShapeConverter(entity);
@@ -240,27 +241,25 @@ PlayState::createScene()
 }
 
 void PlayState::updatePlayer(){
-  Ogre::Vector3 imp = Ogre::Vector3(0,50,0);
+  Ogre::Vector3 imp = Ogre::Vector3(0,0,0);
   if(_arriba){
-    _player_rb->enableActiveState();
-    _player_rb->setLinearVelocity(-5,0,0);
-    std::cout << "1" << std::endl;
-  }else if (_abajo){
-    _player_rb->enableActiveState();
-    _player_rb->setLinearVelocity(5,0,0);
-  }else if(_izquierda){
-    _player_rb->enableActiveState();
-    _player_rb->setLinearVelocity(0,0,5);
-  }else if(_derecha){
-     _player_rb->enableActiveState();
-    _player_rb->setLinearVelocity(0,0,-5);
-  }else{
-    _player_rb->setLinearVelocity(0,0,0);
+    imp+=Ogre::Vector3(-5.0,0.0,0.0);
   }
-  if(_salto){
-    _player_rb->enableActiveState();
-    _player_rb->applyForce(imp, _player->getPosition());
+  if (_abajo){
+    imp+=Ogre::Vector3(5.0,0.0,0.0);
   }
+  if(_izquierda){
+    imp+=Ogre::Vector3(0.0,0.0,5.0);
+  }
+  if(_derecha){
+    imp+=Ogre::Vector3(0.0,0.0,-5.0);
+  }
+  if(_salto /*or _player->getPosition().y <= 0.5*/){
+    _player_rb->applyForce(Ogre::Vector3(0.0, 3.0 ,0.0), _player->getPosition());
+    //imp+=Ogre::Vector3(0.0,3.0,0.0);
+  }
+  _player_rb->enableActiveState();
+  _player_rb->setLinearVelocity(imp);
 }
 
 bool
@@ -287,7 +286,7 @@ PlayState::frameEnded
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
-  if (_exitGame)
+  if(_exitGame)
     return false;
   
   return true;
@@ -326,16 +325,16 @@ PlayState::keyReleased
 (const OIS::KeyEvent &e)
 {
   switch(e.key){
-   case OIS::KC_UP:
+  case OIS::KC_UP:
     _arriba = false;
     break;
-   case OIS::KC_DOWN:
+  case OIS::KC_DOWN:
     _abajo = false;
     break;
-   case OIS::KC_RIGHT:
+  case OIS::KC_RIGHT:
     _derecha = false;
     break;
-   case OIS::KC_LEFT:
+  case OIS::KC_LEFT:
     _izquierda = false;
     break;
   case OIS::KC_SPACE:
@@ -350,6 +349,10 @@ void
 PlayState::mouseMoved
 (const OIS::MouseEvent &evt)
 {
+  _camera->yaw(Degree(evt.state.X.rel * -0.1f));
+  _camera->pitch(Degree(evt.state.Y.rel * -0.1f));
+  _player->yaw(Degree(evt.state.X.rel * +0.9f));
+  _player->pitch(Degree(evt.state.Y.rel * +0.9f));
 }
 
 void
