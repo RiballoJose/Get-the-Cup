@@ -106,7 +106,7 @@ bool MenuState::cfg(const CEGUI::EventArgs &e)
 
   _size = (CEGUI::ItemListbox *)configWin->getChild("ResListbox");
   _full = (CEGUI::ToggleButton *) configWin->getChild("FullscrCheckbox");
-  
+  _full->setSelected(false);
   CEGUI::Window* exitButton = configWin->getChild("ExitButton");
   exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::back, this));
@@ -139,17 +139,19 @@ bool MenuState::apply(const CEGUI::EventArgs &e)
   if(file.is_open()){
     for(int i = 0; i < 9; i++)
       getline(file,str);
-    newline << "Video Mode= " << (_size->getLastSelectedItem()->getText());
+    if(_size->getLastSelectedItem()){
+      newline << "Video Mode= " << (_size->getLastSelectedItem()->getText())<<'\n';
+      file.seekp(-std::ios::off_type(str.size()) - 1, std::ios_base::cur);
+      //file << newline.str();
+      //newline.clear();newline.str("");
+    }
+    getline(file,str);
+    if(_full->isSelected()){newline << "Full Screen=Yes";}
+    else{newline << "Full Screen=No ";}
     file.seekp(-std::ios::off_type(str.size()) - 1, std::ios_base::cur);
     file << newline.str();
-    getline(file,str);
-    newline.clear();newline.str("");
-    /*if(_full->isSelected())
-      newline << "Full screen=Yes";
-    else
-      newline << "Full screen= No";
-    file.seekp(-std::ios::off_type(str.size()) - 1, std::ios_base::cur);
-    file << newline.str();*/
+
+    file.close();
   }
   return true;
 }
