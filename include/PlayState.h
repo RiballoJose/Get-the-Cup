@@ -77,7 +77,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Real _deltaT;
 
   //bool _exitGame, _derecha, _arriba, _abajo, _izquierda, _shoot;
-  bool _arriba;
+  bool _arriba, _salto;
 
   // Inicialización elementos de la simulación -----------------
   OgreBulletDynamics::DynamicsWorld * _world;
