@@ -11,7 +11,7 @@ IntroState::enter ()
   _sceneMgr = _root->createSceneManager(Ogre::ST_GENERIC, "SceneManager");
   _camera = _sceneMgr->createCamera("IntroCamera");
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
-
+  createGUI();
   _exitGame = false;
 }
 
@@ -32,6 +32,16 @@ IntroState::resume ()
 {
 }
 
+void
+IntroState::createGUI()
+{
+  _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","intro");
+
+  //Config Window
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("intro.layout");
+  _sheet->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
+}
 bool
 IntroState::frameStarted
 (const Ogre::FrameEvent& evt) 
@@ -55,9 +65,8 @@ IntroState::keyPressed
 {
   // Transición al siguiente estado.
   // Espacio --> PlayState
-  if (e.key == OIS::KC_SPACE) {
+  if (e.key != OIS::KC_ESCAPE) 
     changeState(MenuState::getSingletonPtr());
-  }
 }
 
 void
@@ -79,6 +88,7 @@ void
 IntroState::mousePressed
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+  changeState(MenuState::getSingletonPtr());
 }
 
 void

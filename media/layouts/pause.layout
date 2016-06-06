@@ -21,8 +21,8 @@
       <Property name="Area" value="{{0.25,0},{0.4,0},{0.75,0},{0.5,0}}" />
     </Window>
     <!-- Settings button -->
-    <Window type="TaharezLook/Button" name="CfgButton" >
-      <Property name="Text" value="Settings" />
+    <Window type="TaharezLook/Button" name="HelpButton" >
+      <Property name="Text" value="Help" />
       <Property name="Area" value="{{0.25,0},{0.55,0},{0.75,0},{0.65,0}}" />
     </Window>
     <Window type="TaharezLook/Button" name="MenuButton" >

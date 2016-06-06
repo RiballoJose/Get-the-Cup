@@ -86,6 +86,8 @@ bool MenuState::help(const CEGUI::EventArgs &e)
 {
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("help.layout");
   _cfg = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+  CEGUI::Window* helpText = configWin->getChild("HelpText");
+  helpText->setText("El objetivo de Get the Cup es llevar a tu\nequipo hasta lo mas alto, y para ello\ndeberas guiar su escudo a traves de niveles y plataformas\nEn ellos encontraras obstaculos y rivales\nque querran impedir tus exitos. Tendras\nque evitarlos!Puedes controlar a tu\npersonaje con las siguientes teclas:");
   CEGUI::Window* exitButton = configWin->getChild("ExitButton");
   exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::back, this));
@@ -101,6 +103,10 @@ bool MenuState::cfg(const CEGUI::EventArgs &e)
 {
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("cfg.layout");
   _cfg = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+
+  _size = (CEGUI::ItemListbox *)configWin->getChild("ResListbox");
+  _full = (CEGUI::ToggleButton *) configWin->getChild("FullscrCheckbox");
+  _full->setSelected(false);
   CEGUI::Window* exitButton = configWin->getChild("ExitButton");
   exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::back, this));
@@ -126,13 +132,26 @@ bool MenuState::back(const CEGUI::EventArgs &e)
 
 bool MenuState::apply(const CEGUI::EventArgs &e)
 {
-  std::ifstream file("ogre.cfg");
+  std::fstream file("ogre.cfg");
   std::string str;
+  std::stringstream newline;
+  newline.str("");
   if(file.is_open()){
     for(int i = 0; i < 9; i++)
       getline(file,str);
-    
-    std::cout << str << std::endl;
+    if(_size->getLastSelectedItem()){
+      newline << "Video Mode= " << (_size->getLastSelectedItem()->getText())<<'\n';
+      file.seekp(-std::ios::off_type(str.size()) - 1, std::ios_base::cur);
+      //file << newline.str();
+      //newline.clear();newline.str("");
+    }
+    getline(file,str);
+    if(_full->isSelected()){newline << "Full Screen=Yes";}
+    else{newline << "Full Screen=No ";}
+    file.seekp(-std::ios::off_type(str.size()) - 1, std::ios_base::cur);
+    file << newline.str();
+
+    file.close();
   }
   return true;
 }
