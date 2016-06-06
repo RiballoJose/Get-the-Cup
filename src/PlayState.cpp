@@ -75,7 +75,7 @@ PlayState::initBullet()
 
   Ogre::Entity* entity=NULL;
   Ogre::SceneNode* node=NULL;
-  Ogre::Vector3 pos = Ogre::Vector3(3,5.0,8.0);
+  Ogre::Vector3 pos = Ogre::Vector3(3,1,8.0);
 
   /* Creacion de la entidad y del SceneNode */
   Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
@@ -274,6 +274,10 @@ PlayState::keyPressed
     break;
   case OIS::KC_SPACE:
     break;
+  case OIS::KC_UP:
+    _player_rb->enableActiveState();
+    _player_rb->setLinearVelocity(-5,0,0);
+    break;
   default:
   break;
   }
@@ -283,6 +287,13 @@ void
 PlayState::keyReleased
 (const OIS::KeyEvent &e)
 {
+  switch(e.key){
+   case OIS::KC_UP:
+    _player_rb->setLinearVelocity(0,0,0);
+    break;
+  default:
+    break;
+  }
 }
 
 void
