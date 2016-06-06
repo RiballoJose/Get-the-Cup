@@ -47,10 +47,12 @@ class PauseState : public Ogre::Singleton<PauseState>, public GameState
   bool play(const CEGUI::EventArgs &e);
   bool save(const CEGUI::EventArgs &e);
   bool load(const CEGUI::EventArgs &e);
-  bool cfg(const CEGUI::EventArgs &e);
+  bool help(const CEGUI::EventArgs &e);
   bool menu(const CEGUI::EventArgs &e);
   bool quit(const CEGUI::EventArgs &e);
-  
+  bool back(const CEGUI::EventArgs &e);
+  bool handleMenuSelection(const CEGUI::EventArgs& e);
+    
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 
@@ -65,6 +67,7 @@ class PauseState : public Ogre::Singleton<PauseState>, public GameState
   Ogre::Camera* _camera;
   
   CEGUI::Window* _sheet;
+  CEGUI::Window* _help;
 
   bool _exitGame;
 };

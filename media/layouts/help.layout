@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout version="4">
+  <Window type="TaharezLook/FrameWindow" name="Help" >
+    <Property name="Text" value="Configuration Window" />
+    <Property name="TitlebarFont" value="DejaVuSans-12" />
+    <Property name="TitlebarEnabled" value="True" />
+    <Property name="Area" value="{{0.25,0},{0.2,0},{0.75,0},{0.8,0}}" />
+    <!--Sound parameter -->
+    <Window type="TaharezLook/StaticText" name="HelpText" >
+      <Property name="Text" value="" />
+      <Property name="Area" value="{{0.1,0},{0.05,0},{0.9,0},{0.45,0}}" />
+    </Window>
+     <!--Sound parameter -->
+    <Window type="TaharezLook/StaticText" name="UpText" >
+      <Property name="Text" value="Flecha arriba (up) = avanza." />
+      <Property name="Area" value="{{0.1,0},{0.51,0},{0.9,0},{0.58,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="DownText" >
+      <Property name="Text" value="Flecha abajo (down) = retrocede." />
+      <Property name="Area" value="{{0.1,0},{0.59,0},{0.9,0},{0.66,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="RightText" >
+      <Property name="Text" value="Flecha derecha (right) = gira a la derecha." />
+      <Property name="Area" value="{{0.1,0},{0.67,0},{0.9,0},{0.73,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="LeftText" >
+      <Property name="Text" value="Flecha izquierda (left) = gira a la izquierda." />
+      <Property name="Area" value="{{0.1,0},{0.74,0},{0.9,0},{0.81,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="SpaceText" >
+      <Property name="Text" value="Barra espaciadora (space) = salta." />
+      <Property name="Area" value="{{0.1,0},{0.82,0},{0.75,0},{0.89,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="PauseText" >
+      <Property name="Text" value="Tecla P = pausa." />
+      <Property name="Area" value="{{0.1,0},{0.9,0},{0.75,0},{0.97,0}}" />
+    </Window>
+    <!-- Exit button -->
+    <Window type="TaharezLook/Button" name="ExitButton" >
+      <Property name="Text" value="Back" />
+      <Property name="Area" value="{{0.784,0},{0.825,0},{0.968,0},{0.966,0}}" />
+    </Window>
+  </Window>
+</GUILayout>

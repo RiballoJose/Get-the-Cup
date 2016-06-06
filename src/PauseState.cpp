@@ -48,9 +48,9 @@ void PauseState::createGUI()
   CEGUI::Window* loadButton = configWin->getChild("LoadButton");
   loadButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&PauseState::load, this));
-  CEGUI::Window* cfgButton = configWin->getChild("CfgButton");
-  cfgButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-  CEGUI::Event::Subscriber(&PauseState::cfg, this));
+  CEGUI::Window* helpButton = configWin->getChild("HelpButton");
+  helpButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&PauseState::help, this));
   CEGUI::Window* menuButton = configWin->getChild("MenuButton");
   menuButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&PauseState::menu, this));
@@ -75,8 +75,17 @@ bool PauseState::load(const CEGUI::EventArgs &e)
 {
   return true;
 }
-bool PauseState::cfg(const CEGUI::EventArgs &e)
+bool PauseState::help(const CEGUI::EventArgs &e)
 {
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("help.layout");
+  _help = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
+  CEGUI::Window* helpText = configWin->getChild("HelpText");
+  helpText->setText("El objetivo de Get the Cup es llevar a tu\nequipo hasta lo mas alto, y para ello\ndeberas guiar su escudo a traves de niveles y plataformas\nEn ellos encontraras obstaculos y rivales\nque querran impedir tus exitos. Tendras\nque evitarlos!Puedes controlar a tu\npersonaje con las siguientes teclas:");
+  CEGUI::Window* exitButton = configWin->getChild("ExitButton");
+  exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&PauseState::back, this));
+  _help->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_help);
   return true;
 }
 bool PauseState::menu(const CEGUI::EventArgs &e)
@@ -85,6 +94,14 @@ bool PauseState::menu(const CEGUI::EventArgs &e)
   changeState(MenuState::getSingletonPtr());
   return true;
 }
+
+bool PauseState::back(const CEGUI::EventArgs &e)
+{
+  //_help->hide();
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
+  return true;
+}
+
 bool PauseState::quit(const CEGUI::EventArgs &e)
 {
   _exitGame = true;
