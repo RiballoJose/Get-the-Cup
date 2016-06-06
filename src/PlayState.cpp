@@ -244,23 +244,15 @@ void PlayState::updatePlayer(){
   if(_arriba){
     _player_rb->enableActiveState();
     _player_rb->setLinearVelocity(-5,0,0);
-  }else{
-    _player_rb->setLinearVelocity(0,0,0);
-  }
-  if(_abajo){
+    std::cout << "1" << std::endl;
+  }else if (_abajo){
     _player_rb->enableActiveState();
     _player_rb->setLinearVelocity(5,0,0);
-  }else{
-    _player_rb->setLinearVelocity(0,0,0);
-  }
-  if(_izquierda){
+  }else if(_izquierda){
     _player_rb->enableActiveState();
     _player_rb->setLinearVelocity(0,0,5);
-  }else{
-    _player_rb->setLinearVelocity(0,0,0);
-  }
-  if(_derecha){
-    _player_rb->enableActiveState();
+  }else if(_derecha){
+     _player_rb->enableActiveState();
     _player_rb->setLinearVelocity(0,0,-5);
   }else{
     _player_rb->setLinearVelocity(0,0,0);
