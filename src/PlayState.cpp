@@ -108,7 +108,11 @@ PlayState::initBullet()
   _player = _sceneMgr->getRootSceneNode()->
     createChildSceneNode();
   _player->attachObject(entity);
-
+  
+  _camera->setPosition(0.0, 0.0, 0.0);
+  _player->attachObject(_camera);
+  _camera->setPosition(Ogre::Vector3(17, 16, -4));
+  _camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
 
   trimeshConverter = new 
     OgreBulletCollisions::StaticMeshToShapeConverter(entity);
@@ -192,7 +196,7 @@ PlayState::createScene()
     ("Muro", Ogre::Vector3(0.0,5.0,8.0));
   Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
   ent2->setCastShadows(true);
-  nodo->attachObject(_camera);
+  //nodo->attachObject(_camera);
   nodo->attachObject(ent2);
 
    /* Fisica */
@@ -243,6 +247,24 @@ void PlayState::updatePlayer(){
   }else{
     _player_rb->setLinearVelocity(0,0,0);
   }
+  if(_abajo){
+    _player_rb->enableActiveState();
+    _player_rb->setLinearVelocity(5,0,0);
+  }else{
+    _player_rb->setLinearVelocity(0,0,0);
+  }
+  if(_izquierda){
+    _player_rb->enableActiveState();
+    _player_rb->setLinearVelocity(0,0,5);
+  }else{
+    _player_rb->setLinearVelocity(0,0,0);
+  }
+  if(_derecha){
+    _player_rb->enableActiveState();
+    _player_rb->setLinearVelocity(0,0,-5);
+  }else{
+    _player_rb->setLinearVelocity(0,0,0);
+  }
   if(_salto){
     _player_rb->enableActiveState();
     _player_rb->applyForce(imp, _player->getPosition());
@@ -290,6 +312,15 @@ PlayState::keyPressed
   case OIS::KC_SPACE:
     _salto=true;
     break;
+  case OIS::KC_DOWN:
+    _abajo = true;
+    break;
+  case OIS::KC_RIGHT:
+    _derecha = true;
+    break;
+  case OIS::KC_LEFT:
+    _izquierda = true;
+    break;
   case OIS::KC_UP:
     _arriba = true;
     break;
@@ -305,6 +336,15 @@ PlayState::keyReleased
   switch(e.key){
    case OIS::KC_UP:
     _arriba = false;
+    break;
+   case OIS::KC_DOWN:
+    _abajo = false;
+    break;
+   case OIS::KC_RIGHT:
+    _derecha = false;
+    break;
+   case OIS::KC_LEFT:
+    _izquierda = false;
     break;
   case OIS::KC_SPACE:
     _salto = false;
