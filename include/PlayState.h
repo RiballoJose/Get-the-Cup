@@ -65,6 +65,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void createScene();
   void initLights();
   void initBullet();
+  void updatePlayer();
 
  protected:
   Ogre::Root* _root;
@@ -74,6 +75,9 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Light* _light;
 
   Ogre::Real _deltaT;
+
+  //bool _exitGame, _derecha, _arriba, _abajo, _izquierda, _shoot;
+  bool _arriba;
 
   // Inicialización elementos de la simulación -----------------
   OgreBulletDynamics::DynamicsWorld * _world;

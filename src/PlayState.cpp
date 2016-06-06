@@ -235,12 +235,22 @@ PlayState::createScene()
   //_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
 }
 
+void PlayState::updatePlayer(){
+  if(_arriba){
+    _player_rb->enableActiveState();
+    _player_rb->setLinearVelocity(-5,0,0);
+  }else{
+    _player_rb->setLinearVelocity(0,0,0);
+  }
+}
+
 bool
 PlayState::frameStarted
 (const Ogre::FrameEvent& evt)
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
+  updatePlayer();
   _camera->setAspectRatio
     (Ogre::Real(_viewport->getActualWidth())/
      Ogre::Real(_viewport->getActualHeight()));
@@ -275,8 +285,7 @@ PlayState::keyPressed
   case OIS::KC_SPACE:
     break;
   case OIS::KC_UP:
-    _player_rb->enableActiveState();
-    _player_rb->setLinearVelocity(-5,0,0);
+    _arriba = true;
     break;
   default:
   break;
@@ -289,7 +298,7 @@ PlayState::keyReleased
 {
   switch(e.key){
    case OIS::KC_UP:
-    _player_rb->setLinearVelocity(0,0,0);
+    _arriba = false;
     break;
   default:
     break;
