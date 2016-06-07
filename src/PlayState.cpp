@@ -60,9 +60,9 @@ PlayState::initLights()
   _light->setSpotlightFalloff(0.0f);
   _light->setCastShadows(true);
 
-  _camera->setPosition(Ogre::Vector3(17, 16, -4));
-  _camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
-  _camera->setNearClipDistance(5);
+  //_camera->setPosition(Ogre::Vector3(17, 16, -4));
+  //_camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
+  _camera->setNearClipDistance(1);
   _camera->setFOVy(Ogre::Degree(38));
 }
 
@@ -104,16 +104,14 @@ PlayState::initBullet()
   /* Anadimos los objetos Shape y RigidBody */
   _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
 
-  std::cout << "2" << std::endl;
-
   entity = _sceneMgr->createEntity("cube" + Ogre::StringConverter::toString(num), "Muro_tex.mesh");
   _player = _sceneMgr->getRootSceneNode()->
     createChildSceneNode();
   _player->attachObject(entity);
   
   _player->attachObject(_camera);
-  _camera->setPosition(Ogre::Vector3(8, 4, 0));
-  _camera->lookAt(Ogre::Vector3(0.0, 5.0, 0.0));
+  _camera->setPosition(Ogre::Vector3(0, 2.5, 5));
+  _camera->lookAt(_player->getPosition());//Ogre::Vector3(0.0, 0.0, 0.0));
 
   trimeshConverter = new 
     OgreBulletCollisions::StaticMeshToShapeConverter(entity);
@@ -127,64 +125,6 @@ PlayState::initBullet()
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
   _shapes.push_back(bodyShape);   _bodies.push_back(_player_rb);
-
-  
-
-  /* Creamos forma de colision para el plano */ 
- /* OgreBulletCollisions::CollisionShape *Shape;
-  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
-    (Ogre::Vector3::UNIT_Y, 0);
-  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
-    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
-
-  /* Creamos la forma estatica (forma, Restitucion, Friccion) */
-  //rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
-  
-  /* Anadimos los objetos Shape y RigidBody */
-  //_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
-  /*_broadphase = new btDbvtBroadphase();
-  std::cout << "1" << std::endl;
-  _collisionConfiguration = new btDefaultCollisionConfiguration();
-  _dispatcher = new btCollisionDispatcher(_collisionConfiguration);
-  _solver = new btSequentialImpulseConstraintSolver;
-  _dynamicsWorld = new btDiscreteDynamicsWorld(_dispatcher,_broadphase,
-                 _solver,_collisionConfiguration);
-
-  // Definicion de las propiedades del mundo -------------------
-  _dynamicsWorld->setGravity(btVector3(0,-10,0));*/
-
-  // Creacion de las formas de colision ------------------------
-  /*btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),1);
-  btCollisionShape* fallShape = new btSphereShape(1);
-  // Definicion de los cuerpos rigidos en la escena ------------
-  btDefaultMotionState* groundMotionState = new btDefaultMotionState
-    (btTransform(btQuaternion(0,0,0,1), btVector3(0,-1,0)));
-  btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI
-    (0,groundMotionState,groundShape,btVector3(0,0,0));
-  btRigidBody* gRigidBody = new btRigidBody(groundRigidBodyCI);
-  _dynamicsWorld->addRigidBody(gRigidBody);
-  btDefaultMotionState* fallMotionState = new btDefaultMotionState
-    (btTransform(btQuaternion(0,0,0,1), btVector3(0,50,0)));
-  btScalar mass = 1;
-  btVector3 fallInertia(0,0,0);
-  fallShape->calculateLocalInertia(mass,fallInertia);
-  btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI
-    (mass,fallMotionState,fallShape,fallInertia);
-  btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
-  _dynamicsWorld->addRigidBody(fallRigidBody);
-  // Bucle principal de la simulacion --------------------------
-  for (int i=0 ; i<300 ; i++) {
-    _dynamicsWorld->stepSimulation(1/60.f,10);
-    btTransform trans;
-    fallRigidBody->getMotionState()->getWorldTransform(trans);
-    std::cout << "Altura: " << trans.getOrigin().getY() << std::endl;
-  }
-  //Finalizacion (limpieza) -----------------------------------
-  _dynamicsWorld->removeRigidBody(fallRigidBody);
-  delete fallRigidBody->getMotionState(); delete fallRigidBody;
-  _dynamicsWorld->removeRigidBody(gRigidBody);
-  delete gRigidBody->getMotionState(); delete gRigidBody;
-  delete fallShape; delete groundShape;*/
 }
 
 void
@@ -192,14 +132,6 @@ PlayState::createScene()
 {
 
   Ogre::SceneNode* nodo = NULL;
-
-  nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode
-    ("Muro", Ogre::Vector3(0.0,5.0,8.0));
-  Ogre::Entity* ent2 = _sceneMgr->createEntity("Muro_tex.mesh");
-  ent2->setCastShadows(true);
-  //nodo->attachObject(_camera);
-  nodo->attachObject(ent2);
-
    /* Fisica */
   _debugDrawer = new OgreBulletCollisions::DebugDrawer();
   _debugDrawer->setDrawWireframe(true);  
@@ -215,51 +147,36 @@ PlayState::createScene()
   _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
-  _world->setShowDebugShapes (false);  // Muestra los collision shapes
-
-  // Creacion de la entidad y del SceneNode ------------------------
-  /*Ogre::Plane plane1(Vector3(0,1,0), 0);    // Normal y distancia
-  MeshManager::getSingleton().createPlane("p1",
-  ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
-  200, 200, 1, 1, true, 1, 20, 20, Vector3::UNIT_Z);
-  Ogre::SceneNode* node = _sceneMgr->createSceneNode("ground");
-  Ogre::Entity* groundEnt = _sceneMgr->createEntity("planeEnt", "p1");
-  groundEnt->setMaterialName("Ground");
-  node->attachObject(groundEnt);
-  _sceneMgr->getRootSceneNode()->addChild(node);
-  // Creamos forma de colision para el plano ----------------------- 
-  OgreBulletCollisions::CollisionShape *Shape;
-  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
-    (Ogre::Vector3(0,1,0), 0);   // Vector normal y distancia
-  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
-    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
-  // Creamos la forma estatica (forma, Restitucion, Friccion) ------
-  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
-  
-  // Anadimos los objetos Shape y RigidBody ------------------------
-  //_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
+  _world->setShowDebugShapes (false);  
 }
 
 void PlayState::updatePlayer(){
-  Ogre::Vector3 imp = Ogre::Vector3(0,0,0);
-  if(_arriba){
-    imp+=Ogre::Vector3(-5.0,0.0,0.0);
+  //Ogre::Vector3 imp = Ogre::Vector3(0,0,0);
+ 
+  /*if(_arriba){
+    imp+=Ogre::Vector3(0.0 , 0.0, 5.0);
   }
   if (_abajo){
-    imp+=Ogre::Vector3(5.0,0.0,0.0);
-  }
-  if(_izquierda){
-    imp+=Ogre::Vector3(0.0,0.0,5.0);
-  }
-  if(_derecha){
     imp+=Ogre::Vector3(0.0,0.0,-5.0);
   }
-  if(_salto /*or _player->getPosition().y <= 0.5*/){
+  if(_izquierda){
+    imp+=Ogre::Vector3(5.0,0.0,0.0);
+  }
+  if(_derecha){
+    imp+=Ogre::Vector3(-5.0,0.0,.0);
+  }
+  if(_salto){
     _player_rb->applyForce(Ogre::Vector3(0.0, 3.0 ,0.0), _player->getPosition());
     //imp+=Ogre::Vector3(0.0,3.0,0.0);
-  }
+    }*/
+  if(_arriba){
   _player_rb->enableActiveState();
-  _player_rb->setLinearVelocity(imp);
+  _player_rb->setLinearVelocity(Ogre::Vector3(_camera->getDirection().x,
+						_camera->getDirection().y*0,
+						_camera->getDirection().z));
+  }
+  else
+    _player_rb->setLinearVelocity(Ogre::Vector3::ZERO);
 }
 
 bool
@@ -277,6 +194,8 @@ PlayState::frameStarted
   direction.normalise();
 
 
+  _player_rb->setOrientation(_camera->getOrientation().w, 0*_camera->getOrientation().x,
+			     _camera->getOrientation().y, 0*_camera->getOrientation().z);
   return true;
 }
 
@@ -286,6 +205,8 @@ PlayState::frameEnded
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
+  //_camera->lookAt(_player->getPosition());//Ogre::Vector3(0.0, 0.0, 0.0));
+
   if(_exitGame)
     return false;
   
@@ -303,16 +224,16 @@ PlayState::keyPressed
   case OIS::KC_SPACE:
     _salto=true;
     break;
-  case OIS::KC_DOWN:
+  case OIS::KC_S:
     _abajo = true;
     break;
-  case OIS::KC_RIGHT:
+  case OIS::KC_D:
     _derecha = true;
     break;
-  case OIS::KC_LEFT:
+  case OIS::KC_A:
     _izquierda = true;
     break;
-  case OIS::KC_UP:
+  case OIS::KC_W:
     _arriba = true;
     break;
   default:
@@ -325,16 +246,16 @@ PlayState::keyReleased
 (const OIS::KeyEvent &e)
 {
   switch(e.key){
-  case OIS::KC_UP:
+  case OIS::KC_W:
     _arriba = false;
     break;
-  case OIS::KC_DOWN:
+  case OIS::KC_S:
     _abajo = false;
     break;
-  case OIS::KC_RIGHT:
+  case OIS::KC_D:
     _derecha = false;
     break;
-  case OIS::KC_LEFT:
+  case OIS::KC_A:
     _izquierda = false;
     break;
   case OIS::KC_SPACE:
@@ -349,22 +270,27 @@ void
 PlayState::mouseMoved
 (const OIS::MouseEvent &evt)
 {
-  _camera->yaw(Degree(evt.state.X.rel * -0.1f));
-  _camera->pitch(Degree(evt.state.Y.rel * -0.1f));
-  _player->yaw(Degree(evt.state.X.rel * +0.9f));
-  _player->pitch(Degree(evt.state.Y.rel * +0.9f));
+  _camera->yaw(Degree(evt.state.X.rel * -0.15f));
+  _camera->pitch(Degree(evt.state.Y.rel * -0.15f));
+  /*_camera->setPosition(Ogre::Vector3(_camera->getPosition().x-(evt.state.X.rel*0.01f),
+				   _camera->getPosition().y,
+				   _camera->getPosition().z));*/
 }
 
 void
 PlayState::mousePressed
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+  if(OIS::MB_Right)
+    _arriba = true;
 }
 
 void
 PlayState::mouseReleased
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
+  if(OIS::MB_Right)
+    _arriba = false;
 }
 
 PlayState*
