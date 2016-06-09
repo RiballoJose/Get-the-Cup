@@ -69,30 +69,26 @@ PlayState::initLights()
 void
 PlayState::initBullet()
 {
-  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL; 
+/*  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL; 
   OgreBulletCollisions::CollisionShape *bodyShape = NULL;
-  OgreBulletDynamics::RigidBody *rigidBody = NULL;
+  OgreBulletDynamics::RigidBody *rigidBody = NULL;*/
 
-  int num = 1;
+  Ogre::Vector3 pos = Ogre::Vector3(0,20,5);
 
-  Ogre::Entity* entity=NULL;
-  Ogre::SceneNode* node=NULL;
-  Ogre::Vector3 pos = Ogre::Vector3(3,5,8.0);
-
-  /* Creacion de la entidad y del SceneNode */
+    /* Creacion de la entidad y del SceneNode */
   Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
-  500, 500, 1, 1, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
-  node = _sceneMgr->createSceneNode("Ground");
+  500, 500, 1, 1, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+  _level = _sceneMgr->createSceneNode("Ground");
   Ogre::Entity* groundEnt = _sceneMgr->createEntity("Base", "p1");
   groundEnt->setCastShadows(false);
   groundEnt->setMaterialName("Ground");
-  node->attachObject(groundEnt);
-  _sceneMgr->getRootSceneNode()->addChild(node);
+  _level->attachObject(groundEnt);
+  _sceneMgr->getRootSceneNode()->addChild(_level);
 
   /* Creamos forma de colision para el plano */ 
-  OgreBulletCollisions::CollisionShape *Shape;
+ OgreBulletCollisions::CollisionShape *Shape;
   Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
     (Ogre::Vector3::UNIT_Y, 0);
   OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
@@ -104,66 +100,68 @@ PlayState::initBullet()
   /* Anadimos los objetos Shape y RigidBody */
   _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
 
-  entity = _sceneMgr->createEntity("cube" + Ogre::StringConverter::toString(num), "Muro_tex.mesh");
-  _player = _sceneMgr->getRootSceneNode()->
-    createChildSceneNode();
+  std::cout << "1" << std::endl;
+ 
+  Ogre::Entity* entity = _sceneMgr->createEntity("Player", "Player.mesh");
+  _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
   _player->attachObject(entity);
 
-  
-  //_player->attachObject(_camera);
-  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 7.5));
-  _camera->lookAt(_player->getPosition().x, 0.5, _player->getPosition().z);
+  OgreBulletCollisions::SphereCollisionShape *sphereShape = 
+  new OgreBulletCollisions::SphereCollisionShape(1.25);
+  OgreBulletDynamics::RigidBody *_player_rb = new OgreBulletDynamics::RigidBody(
+            "rigidBody_player", _world);
 
-  trimeshConverter = new 
-    OgreBulletCollisions::StaticMeshToShapeConverter(entity);
-  bodyShape = trimeshConverter->createConvex();
+  _player_rb->setShape(_player, sphereShape,
+                  0.6 /* Restitucion */, 1.5 /* Friccion */,
+                  2.5/* Masa */,pos,
+                  Ogre::Quaternion::IDENTITY /* Orientacion */);
 
-  _player_rb = new OgreBulletDynamics::RigidBody("rigidBody" + Ogre::StringConverter::toString(num), _world);
 
-  _player_rb->setShape(_player, bodyShape,
-         0.6 /* Restitucion */, 1.5 /* Friccion */,
-         5.0 /* Masa */, pos /* Posicion inicial */,
-         Ogre::Quaternion::IDENTITY /* Orientacion */);
+  _shapes.push_back(sphereShape);   _bodies.push_back(_player_rb);
 
-  _player_rb->getBulletRigidBody()->setAngularFactor(btVector3(1,1,1));
-
-  _shapes.push_back(bodyShape);   _bodies.push_back(_player_rb);
 }
 
 void
 PlayState::createScene()
 {
 
-  Ogre::SceneNode* nodo = NULL;
-   /* Fisica */
-  _debugDrawer = new OgreBulletCollisions::DebugDrawer();
-  _debugDrawer->setDrawWireframe(true);  
-  nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(
-    "debugNode", Ogre::Vector3::ZERO);
-  nodo->attachObject(static_cast<Ogre::SimpleRenderable *>(_debugDrawer));
+    _debugDrawer = new OgreBulletCollisions::DebugDrawer();
+    _debugDrawer->setDrawWireframe(true);  
+    Ogre::SceneNode* node = _sceneMgr->getRootSceneNode()->createChildSceneNode(
+        "debugNode", Ogre::Vector3::ZERO);
+    node->attachObject(static_cast<Ogre::SimpleRenderable *>(_debugDrawer));
 
-  Ogre::AxisAlignedBox worldBounds = Ogre::AxisAlignedBox (
-    Ogre::Vector3 (-10000, -10000, -10000), 
-    Ogre::Vector3 (10000,  10000,  10000));
-  Ogre::Vector3 gravity = Ogre::Vector3(0, -9.8, 0);
+    Ogre::AxisAlignedBox worldBounds = Ogre::AxisAlignedBox (
+        Ogre::Vector3 (-10000, -10000, -10000), 
+        Ogre::Vector3 (10000,  10000,  10000));
+    Ogre::Vector3 gravity = Ogre::Vector3(0, -9.8, 0);
 
-  _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
-     worldBounds, gravity);
-  _world->setDebugDrawer (_debugDrawer);
-  _world->setShowDebugShapes (false);
-
-  _jump = false;
+    _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
+        worldBounds, gravity);
+    _world->setDebugDrawer (_debugDrawer);
+    _world->setShowDebugShapes (false);  // Muestra los collision shapes
 }
 
 void PlayState::updatePlayer(){
-  Ogre::Vector3 imp = Ogre::Vector3::ZERO;
-  bool move = false;
+  //Ogre::Vector3 imp = Ogre::Vector3::ZERO;
+  //bool move = false;
   if(_arriba){
-   imp.z = -0.5;
-   move = true;
- 
+    _level->pitch(Degree(5*_deltaT));
+    std::cout << "hola"<< std::endl;
   }
-  if (_abajo){
+  if(_abajo){
+    _level->pitch(Degree(-5*_deltaT));
+    std::cout << "hola"<< std::endl;
+  }
+  if(_izquierda){
+    _level->roll(Degree(5*_deltaT));
+    std::cout << "hola"<< std::endl;
+  }
+  if(_derecha){
+    _level->roll(Degree(-5*_deltaT));
+    std::cout << "hola"<< std::endl;
+  }
+/*  if (_abajo){
     imp.z = 0.5;
     move = true;
 
@@ -188,7 +186,7 @@ void PlayState::updatePlayer(){
   _player_rb->setLinearVelocity(imp*5);
   //_player_rb->applyGravity();
   //_player_rb->applyImpulse(imp*5, _player->getPosition());
-  }
+  }*/
 }
 
 bool
@@ -197,12 +195,14 @@ PlayState::frameStarted
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
-  updatePlayer();
-  _camera->setAspectRatio
-    (Ogre::Real(_viewport->getActualWidth())/
-     Ogre::Real(_viewport->getActualHeight()));
-  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 7.5));
+ updatePlayer();
+ _camera->setAspectRatio
+   (Ogre::Real(_viewport->getActualWidth())/
+    Ogre::Real(_viewport->getActualHeight()));
+  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 50));
   _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);
+
+  //std::cout << _player->getPosition().y << std::endl;
   
   /*_player_rb->setOrientation(_camera->getOrientation().w, 0*_camera->getOrientation().x,
     _camera->getOrientation().y, 0*_camera->getOrientation().z);*/

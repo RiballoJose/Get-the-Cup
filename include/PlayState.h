@@ -30,6 +30,7 @@
 #include <Shapes/OgreBulletCollisionsConvexHullShape.h>
 #include <Shapes/OgreBulletCollisionsTrimeshShape.h>
 #include <Utils/OgreBulletCollisionsMeshToShapeConverter.h> 
+ #include <Shapes/OgreBulletCollisionsSphereShape.h>
 
 
 using namespace Ogre;
@@ -87,6 +88,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   std::deque <OgreBulletCollisions::CollisionShape *>  _shapes;
   
   Ogre::SceneNode* _player;
+  Ogre::SceneNode* _level;
   OgreBulletDynamics::RigidBody *_player_rb;
   
   bool _exitGame;
