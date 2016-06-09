@@ -42,12 +42,12 @@ void PauseState::createGUI()
   CEGUI::Window* playButton = configWin->getChild("PlayButton");
   playButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&PauseState::play, this));
-  CEGUI::Window* saveButton = configWin->getChild("SaveButton");
+  /*CEGUI::Window* saveButton = configWin->getChild("SaveButton");
   saveButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&PauseState::save, this));
   CEGUI::Window* loadButton = configWin->getChild("LoadButton");
   loadButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-  CEGUI::Event::Subscriber(&PauseState::load, this));
+  CEGUI::Event::Subscriber(&PauseState::load, this));*/
   CEGUI::Window* helpButton = configWin->getChild("HelpButton");
   helpButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&PauseState::help, this));
@@ -67,14 +67,14 @@ bool PauseState::play(const CEGUI::EventArgs &e)
   popState();
   return true;
 }
-bool PauseState::save(const CEGUI::EventArgs &e)
+/*bool PauseState::save(const CEGUI::EventArgs &e)
 {
   return true;
 }
 bool PauseState::load(const CEGUI::EventArgs &e)
 {
   return true;
-}
+  }*/
 bool PauseState::help(const CEGUI::EventArgs &e)
 {
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("help.layout");

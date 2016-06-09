@@ -45,8 +45,8 @@ class PauseState : public Ogre::Singleton<PauseState>, public GameState
 
   void createGUI();
   bool play(const CEGUI::EventArgs &e);
-  bool save(const CEGUI::EventArgs &e);
-  bool load(const CEGUI::EventArgs &e);
+  //bool save(const CEGUI::EventArgs &e);
+  //bool load(const CEGUI::EventArgs &e);
   bool help(const CEGUI::EventArgs &e);
   bool menu(const CEGUI::EventArgs &e);
   bool quit(const CEGUI::EventArgs &e);

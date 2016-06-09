@@ -51,9 +51,9 @@ void MenuState::createGUI()
   playButton->subscribeEvent(CEGUI::PushButton::EventClicked,
   CEGUI::Event::Subscriber(&MenuState::play, this));
   
-  CEGUI::Window* loadButton = configWin->getChild("LoadButton");
+  /*CEGUI::Window* loadButton = configWin->getChild("LoadButton");
   loadButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-  CEGUI::Event::Subscriber(&MenuState::load, this));
+  CEGUI::Event::Subscriber(&MenuState::load, this));*/
 
   CEGUI::Window* helpButton = configWin->getChild("HelpButton");
   helpButton->subscribeEvent(CEGUI::PushButton::EventClicked,
@@ -81,10 +81,12 @@ bool MenuState::play(const CEGUI::EventArgs &e)
   changeState(PlayState::getSingletonPtr());
   return true;
 }
-bool MenuState::load(const CEGUI::EventArgs &e)
+
+/*bool MenuState::load(const CEGUI::EventArgs &e)
 {
   return true;
-}
+  }*/
+
 bool MenuState::help(const CEGUI::EventArgs &e)
 {
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("help.layout");

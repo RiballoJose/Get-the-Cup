@@ -110,9 +110,9 @@ PlayState::initBullet()
   _player->attachObject(entity);
 
   
- // _player->attachObject(_camera);
-//  _camera->setPosition(Ogre::Vector3(0, 2.5, 10));
-//  _camera->lookAt(_player->getPosition());//Ogre::Vector3(0.0, 0.0, 0.0));
+  //_player->attachObject(_camera);
+  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 7.5));
+  _camera->lookAt(_player->getPosition().x, 0.5, _player->getPosition().z);
 
   trimeshConverter = new 
     OgreBulletCollisions::StaticMeshToShapeConverter(entity);
@@ -150,11 +150,13 @@ PlayState::createScene()
   _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
-  _world->setShowDebugShapes (false);  
+  _world->setShowDebugShapes (false);
+
+  _jump = false;
 }
 
 void PlayState::updatePlayer(){
-  Ogre::Vector3 imp = Ogre::Vector3(0,0,0);
+  Ogre::Vector3 imp = Ogre::Vector3::ZERO;
   bool move = false;
   if(_arriba){
    imp.z = -0.5;
@@ -176,21 +178,17 @@ void PlayState::updatePlayer(){
    move = true;
 
   }
-  if(_salto){
-    imp.y = 1;
+  if(_salto && !_jump){
+    imp.y = 2;
     move = true;
-
+    _jump = true;
   }
   if(move){
   _player_rb->enableActiveState();
   _player_rb->setLinearVelocity(imp*5);
-
-}
- /*if(_arriba){
-  _player_rb->enableActiveState();
-  _player_rb->setLinearVelocity(Ogre::Vector3(_camera->getDirection().x,
-						_camera->getDirection().y*0,
-						_camera->getDirection().z));*/
+  //_player_rb->applyGravity();
+  //_player_rb->applyImpulse(imp*5, _player->getPosition());
+  }
 }
 
 bool
@@ -203,13 +201,16 @@ PlayState::frameStarted
   _camera->setAspectRatio
     (Ogre::Real(_viewport->getActualWidth())/
      Ogre::Real(_viewport->getActualHeight()));
+  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 7.5));
+  _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);
+  
+  /*_player_rb->setOrientation(_camera->getOrientation().w, 0*_camera->getOrientation().x,
+    _camera->getOrientation().y, 0*_camera->getOrientation().z);*/
+  
   Ogre::Vector3 movement(0, 0, 0);
   Ogre::Vector3 direction = _player->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z;
   direction.normalise();
 
-
- // _player_rb->setOrientation(_camera->getOrientation().w, 0*_camera->getOrientation().x,
-//			     _camera->getOrientation().y, 0*_camera->getOrientation().z);
   return true;
 }
 
@@ -219,11 +220,13 @@ PlayState::frameEnded
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
-  //_camera->lookAt(_player->getPosition());//Ogre::Vector3(0.0, 0.0, 0.0));
 
   if(_exitGame)
     return false;
-  
+
+  //std::cout << _player->getPosition().y << std::endl;
+  if(_jump && _player_rb->getLinearVelocity().y<0.05 && _player->getPosition().y <1.1)
+    _jump = false;
   return true;
 }
 
@@ -285,11 +288,8 @@ void
 PlayState::mouseMoved
 (const OIS::MouseEvent &evt)
 {
-  _camera->yaw(Degree(evt.state.X.rel * -0.15f));
-  _camera->pitch(Degree(evt.state.Y.rel * -0.15f));
-  /*_camera->setPosition(Ogre::Vector3(_camera->getPosition().x-(evt.state.X.rel*0.01f),
-				   _camera->getPosition().y,
-				   _camera->getPosition().z));*/
+  /*_camera->yaw(Degree(evt.state.X.rel * -0.15f));
+  _camera->pitch(Degree(evt.state.Y.rel * -0.15f));*/
 }
 
 void
