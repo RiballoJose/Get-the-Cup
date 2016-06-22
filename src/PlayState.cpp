@@ -18,6 +18,7 @@ PlayState::enter ()
   initLights();
   createScene();
   initBullet();
+  loadLevel(1);
   
   _exitGame = false;
 }
@@ -75,8 +76,6 @@ PlayState::initBullet()
 
   int fuerza = 5;
 
-
-
 /* Creacion de la entidad y del SceneNode */
   Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
@@ -88,8 +87,6 @@ PlayState::initBullet()
   groundEnt->setMaterialName("Ground");
   node->attachObject(groundEnt);
   _sceneMgr->getRootSceneNode()->addChild(node);
-
-  std::cout << "2" << std::endl;
 
   /* Creamos forma de colision para el plano */ 
   OgreBulletCollisions::CollisionShape *Shape;
@@ -103,8 +100,6 @@ PlayState::initBullet()
   
   /* Anadimos los objetos Shape y RigidBody */
   _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
-
-  std::cout << "1" << std::endl;
 
   Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
   node = _sceneMgr->getRootSceneNode()->
@@ -169,6 +164,73 @@ PlayState::createScene()
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
   _world->setShowDebugShapes (false);  // Muestra los collision shapes
+}
+
+void PlayState::loadLevel(int l)
+{
+  Ogre::Entity* ent = NULL;
+  Ogre::SceneNode* nodo = NULL;
+  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL;
+  OgreBulletCollisions::CollisionShape *bodyShape = NULL;
+  OgreBulletDynamics::RigidBody *rigidBody = NULL;
+  std::stringstream bloq, material, rb;
+  bloq.str(""); material.str(""); rb.str("");
+
+  
+  std::stringstream level;
+  std::string line;
+  int x, y , type;
+  level << "level_" << l << ".txt";
+  std::ifstream file;
+  file.open("level_1.txt");//level.str());
+  int i = 0; int z = -1;
+  
+  if(file.is_open()){
+    while(getline(file, line))
+      {
+	if(*line.begin()!=35)
+	  {
+	    x = y = type = -1; z++;
+	    for(std::string::iterator it = line.begin(); it != line.end(); ++it)
+	      {
+		if(*it==40)
+		  {
+		    x = *(++it)-48; ++it; y = *(++it)-48; ++it; type = *(++it)-48; ++it;
+		    bloq << "Cube_" <</* type << "_" <<*/ i++;
+		    nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(bloq.str(), Ogre::Vector3(x,y,z));
+		    switch(type)
+		      {
+		      case 0:
+			ent = _sceneMgr->createEntity("Muro.mesh");
+			//break;
+		      case 1:
+			ent = _sceneMgr->createEntity("Muro.mesh");
+			//break;
+		      case 2:
+			ent = _sceneMgr->createEntity("Muro.mesh");
+			//break;
+		      default:
+			nodo->attachObject(ent);
+		      }
+		    
+		    rb << "RigidBody_" << i;
+
+		    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+		    bodyShape = trimeshConverter->createConvex();
+		    rigidBody = new OgreBulletDynamics::RigidBody(rb.str(), _world);
+		    rigidBody->setShape(nodo, bodyShape,
+					0.6, 0.6 , 5.0 , Ogre::Vector3(x,y,z), Ogre::Quaternion::IDENTITY);
+		    
+		    _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
+		  }
+		i++;
+	      }
+	    
+	  }
+	//std::cout << std::endl;
+      }
+    file.close();
+  }
 }
 
 void PlayState::updatePlayer(){
@@ -317,8 +379,8 @@ void
 PlayState::mouseMoved
 (const OIS::MouseEvent &evt)
 {
-  /*_camera->yaw(Degree(evt.state.X.rel * -0.15f));
-  _camera->pitch(Degree(evt.state.Y.rel * -0.15f));*/
+  _camera->yaw(Degree(evt.state.X.rel * -0.15f));
+  _camera->pitch(Degree(evt.state.Y.rel * -0.15f));
 }
 
 void

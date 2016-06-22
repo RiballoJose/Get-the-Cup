@@ -67,6 +67,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void initLights();
   void initBullet();
   void updatePlayer();
+  void loadLevel(int l);
 
  protected:
   Ogre::Root* _root;
