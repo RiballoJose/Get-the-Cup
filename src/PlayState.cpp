@@ -18,7 +18,7 @@ PlayState::enter ()
   initLights();
   createScene();
   initBullet();
-  loadLevel(1);
+  //loadLevel(1);
   
   _exitGame = false;
 }
@@ -71,16 +71,16 @@ void
 PlayState::initBullet()
 {
 
-  Ogre::Vector3 pos = Ogre::Vector3(0,2,5);
+  Ogre::Vector3 pos = Ogre::Vector3(0,10,5);
   Ogre::Vector3 dir = Ogre::Vector3(-1,1,0);
 
   int fuerza = 5;
 
 /* Creacion de la entidad y del SceneNode */
-  Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
-  500, 500, 20, 20, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
+  50, 50, 20, 20, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
   Ogre::SceneNode* node = _sceneMgr->createSceneNode("Ground");
   Ogre::Entity* groundEnt = _sceneMgr->createEntity("Base", "p1");
   groundEnt->setCastShadows(false);
@@ -124,6 +124,34 @@ PlayState::initBullet()
   rigidBody->setLinearVelocity(dir * fuerza);
 
   _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
+
+  pos = Ogre::Vector3(0,15,5);
+
+  entity = _sceneMgr->createEntity("base", "Muro.mesh");
+  node = _sceneMgr->getRootSceneNode()->
+    createChildSceneNode();
+  node->attachObject(entity);
+
+  trimeshConverter = new 
+    OgreBulletCollisions::StaticMeshToShapeConverter(entity);
+  bodyShape = trimeshConverter->createConvex();
+
+  OgreBulletDynamics::RigidBody *rigidBodyBase = new OgreBulletDynamics::RigidBody("rigidBodyBase", _world);
+
+  rigidBodyBase->setShape(node, bodyShape,
+         0.6 /* Restitucion */, 0.6 /* Friccion */,
+         5.0 /* Masa */, pos /* Posicion inicial */,
+         Ogre::Quaternion::IDENTITY /* Orientacion */);
+
+  rigidBodyBase->setGravity(0,0,0);
+
+  _shapes.push_back(bodyShape);   _bodies.push_back(rigidBodyBase);
+
+
+
+
+
+
  
 /*  Ogre::Entity* entity = _sceneMgr->createEntity("Player", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -166,7 +194,7 @@ PlayState::createScene()
   _world->setShowDebugShapes (false);  // Muestra los collision shapes
 }
 
-void PlayState::loadLevel(int l)
+/*void PlayState::loadLevel(int l)
 {
   Ogre::Entity* ent = NULL;
   Ogre::SceneNode* nodo = NULL;
@@ -195,9 +223,9 @@ void PlayState::loadLevel(int l)
 	      {
 		if(*it==40)
 		  {
-		    x = *(++it)-48; ++it; y = *(++it)-48; ++it; type = *(++it)-48; ++it;
-		    bloq << "Cube_" <</* type << "_" <<*/ i++;
-		    nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(bloq.str(), Ogre::Vector3(x,y,z));
+		    x = *(++it)-48; ++it; y = *(++it)-48; ++it; type = *(++it)-48; ++it;*/
+		  //bloq << "Cube_" <</* type << "_" <<*/ i++;
+		  /*nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(bloq.str(), Ogre::Vector3(x,y,z));
 		    switch(type)
 		      {
 		      case 0:
@@ -227,18 +255,21 @@ void PlayState::loadLevel(int l)
 	      }
 	    
 	  }
-	//std::cout << std::endl;
+	std::cout << std::endl;
       }
     file.close();
   }
-}
+}*/
 
 void PlayState::updatePlayer(){
-  //Ogre::Vector3 imp = Ogre::Vector3::ZERO;
+  btVector3 torque = btVector3(100,0,0);
   //bool move = false;
   if(_arriba){
-    _level->pitch(Degree(5*_deltaT));
+    _bodies.at(_bodies.size()-1)->enableActiveState();
+    _bodies.at(_bodies.size()-1)->getBulletRigidBody()->applyTorque(torque);
     std::cout << "hola 1"<< std::endl;
+    std::cout << _bodies.size() << std::endl;
+
   }
   if(_abajo){
     _level->pitch(Degree(-5*_deltaT));
@@ -286,7 +317,7 @@ PlayState::frameStarted
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
- //updatePlayer();
+ updatePlayer();
 /* _camera->setAspectRatio
    (Ogre::Real(_viewport->getActualWidth())/
     Ogre::Real(_viewport->getActualHeight()));
