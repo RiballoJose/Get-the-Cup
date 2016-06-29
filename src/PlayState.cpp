@@ -72,12 +72,12 @@ PlayState::initBullet()
 {
 
   Ogre::Vector3 pos = Ogre::Vector3(0,10,5);
-  Ogre::Vector3 dir = Ogre::Vector3(-1,1,0);
+  Ogre::Vector3 dir = Ogre::Vector3(0,0,0);
 
   int fuerza = 5;
 
 /* Creacion de la entidad y del SceneNode */
-Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+/*Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
   50, 50, 20, 20, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
@@ -89,41 +89,38 @@ Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   _sceneMgr->getRootSceneNode()->addChild(node);
 
   /* Creamos forma de colision para el plano */ 
-  OgreBulletCollisions::CollisionShape *Shape;
+  /* OgreBulletCollisions::CollisionShape *Shape;
   Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
     (Ogre::Vector3::UNIT_Y, 0);
   OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
-    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
+    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);/
 
   /* Creamos la forma estatica (forma, Restitucion, Friccion) */
-  rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); 
+    /* rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); */
   
   /* Anadimos los objetos Shape y RigidBody */
-  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
-
+  /*_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
   Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
-  node = _sceneMgr->getRootSceneNode()->
-    createChildSceneNode();
-  node->attachObject(entity);
+  _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
+  _player->attachObject(entity);
 
   OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL; 
   OgreBulletCollisions::CollisionShape *bodyShape = NULL;
-  OgreBulletDynamics::RigidBody *rigidBody = NULL;
 
   trimeshConverter = new 
     OgreBulletCollisions::StaticMeshToShapeConverter(entity);
   bodyShape = trimeshConverter->createConvex();
 
-  rigidBody = new OgreBulletDynamics::RigidBody("rigidBody", _world);
+  _player_rb = new OgreBulletDynamics::RigidBody("rigidBody", _world);
 
-  rigidBody->setShape(node, bodyShape,
+  _player_rb->setShape(_player, bodyShape,
          0.6 /* Restitucion */, 0.6 /* Friccion */,
          5.0 /* Masa */, pos /* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
-  rigidBody->setLinearVelocity(dir * fuerza);
+  _player_rb->setLinearVelocity(dir * fuerza);
 
-  _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
+  _shapes.push_back(bodyShape);   _bodies.push_back(_player_rb);
 }
 
 void
@@ -140,7 +137,7 @@ PlayState::createScene()
   Ogre::AxisAlignedBox worldBounds = Ogre::AxisAlignedBox (
     Ogre::Vector3 (-10000, -10000, -10000), 
     Ogre::Vector3 (10000,  10000,  10000));
-  Ogre::Vector3 gravity = Ogre::Vector3(0, -9.8, 0);
+  Ogre::Vector3 gravity = Ogre::Vector3(0, -10, 0);
 
   _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
      worldBounds, gravity);
@@ -161,23 +158,23 @@ void PlayState::loadLevel(int l)
   
   std::stringstream level;
   std::string line;
-  int x, y , type;
+  int x, y, z, type;
   level << "level_" << l << ".txt";
   std::ifstream file;
   file.open("level_1.txt");//level.str());
-  int i = 0; int z = -1;
+  int i = 0;
   
   if(file.is_open()){
     while(getline(file, line))
       {
 	if(*line.begin()!=35)
 	  {
-	    x = y = type = -1; z++;
+	    x = y = z = type = -1;
 	    for(std::string::iterator it = line.begin(); it != line.end(); ++it)
 	      {
 		if(*it==40)
 		  {
-		    x = *(++it)-48; ++it; y = *(++it)-48; ++it; type = *(++it)-48; ++it;
+		    x = (*(++it)-48); ++it; y = (*(++it)-48); ++it; z = (*(++it)-48)+13*(-i); ++it; type = (*(++it)-48); ++it;
 		    bloq << "Cube_" <</* type << "_" <<*/ i++;
 		    nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(bloq.str(), Ogre::Vector3(x,y,z));
 		    switch(type)
@@ -200,16 +197,17 @@ void PlayState::loadLevel(int l)
 		    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
 		    bodyShape = trimeshConverter->createConvex();
 		    rigidBody = new OgreBulletDynamics::RigidBody(rb.str(), _world);
-		    rigidBody->setShape(nodo, bodyShape,
-					0.6, 1.0 , 5.0 , Ogre::Vector3(x,y+10,z), Ogre::Quaternion::IDENTITY);
+		    rigidBody->setStaticShape(nodo, bodyShape,
+					      0.6, 1.0 , /*5.0,*/ Ogre::Vector3(x,y,z), Ogre::Quaternion/*(1.0,1.0,1.0,1.0)*/::IDENTITY);
 		    rigidBody->setGravity(0.0,0.0,0.0);
+		    //rigidBody->setKinematicObject(true);
 		    _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
-		    break;
+		    //break;
 		  }
 		i++;
-		break;
+		//break;
 	      }
-	    break;
+	    //break;
 	  }
 	//std::cout << std::endl;
       }
@@ -218,24 +216,43 @@ void PlayState::loadLevel(int l)
 }
 
 void PlayState::updatePlayer(){
-  //Ogre::Vector3 imp = Ogre::Vector3::ZERO;
-  //bool move = false;
+  int vel = 5;
+  Ogre::Vector3 lv = Ogre::Vector3::ZERO;
+  //btVector3 av = btVector3(0,0,0);
+  bool move = false;
   if(_arriba){
-    _bodies.at(_bodies.size()-1)->enableActiveState();
-    _bodies.at(_bodies.size()-1)->getBulletRigidBody()->applyTorque(btVector3(0, 0, 100));
+    lv+=Ogre::Vector3(0,0,-1*vel);
+    move = true;
+    /*_player_rb->enableActiveState();
+    _player_rb->applyForce(Ogre::Vector3(0, 0, -20), _player->getPosition());*/
   }
   if(_abajo){
-    _bodies.at(_bodies.size()-1)->enableActiveState();
-    _bodies.at(_bodies.size()-1)->getBulletRigidBody()->applyTorque(btVector3(0, 0, -100));
+    lv+=Ogre::Vector3(0,0,1*vel);
+    move = true;
+  /*_player_rb->enableActiveState();
+  _player_rb->applyForce(Ogre::Vector3(0, 0, 20), _player->getPosition());*/
   }
   if(_izquierda){
-    _bodies.at(_bodies.size()-1)->enableActiveState();
-    _bodies.at(_bodies.size()-1)->getBulletRigidBody()->applyTorque(btVector3(100, 0, 0));
+    //av+=btVector3(0,1*vel,0);
+    lv+=Ogre::Vector3(-1*vel,0,0);
+    move = true;
+    /*_player_rb->enableActiveState();
+    //_player_rb->applyForce(Ogre::Vector3(-100, 0, 0), _player->getPosition());
+    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,2,0));//->applyTorque(btVector3(0, 2, 0));*/
   }
   if(_derecha){
-    _bodies.at(_bodies.size()-1)->enableActiveState();
-    _bodies.at(_bodies.size()-1)->getBulletRigidBody()->applyTorque(btVector3(-100, 0, 0));
-    }
+    //av+=btVector3(0,-1*vel,0);
+    lv+=Ogre::Vector3(1*vel,0,0);
+    move = true;
+    /*_player_rb->enableActiveState();
+    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,-2,0));//applyTorque(btVector3(0, -2, 0));
+    //_player_rb->applyForce(Ogre::Vector3(100, 0, 0), _player->getPosition());*/
+  }
+  if(move){
+    _player_rb->enableActiveState();
+    _player_rb->applyForce(lv, _player->getPosition());
+    ///_player_rb->getBulletRigidBody()->setAngularFactor(av);
+  }
 }
 
 bool
@@ -245,11 +262,11 @@ PlayState::frameStarted
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
   updatePlayer();
-/* _camera->setAspectRatio
+  _camera->setAspectRatio
    (Ogre::Real(_viewport->getActualWidth())/
     Ogre::Real(_viewport->getActualHeight()));
-  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 50));
-  _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);*/
+  _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 10));
+  _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);
 
   //std::cout << _player->getPosition().y << std::endl;
   
@@ -337,8 +354,8 @@ void
 PlayState::mouseMoved
 (const OIS::MouseEvent &evt)
 {
-  _camera->yaw(Degree(evt.state.X.rel * -0.15f));
-  _camera->pitch(Degree(evt.state.Y.rel * -0.15f));
+  //_camera->yaw(Degree(evt.state.X.rel * -0.15f));
+  //_camera->pitch(Degree(evt.state.Y.rel * -0.15f));
 }
 
 void
