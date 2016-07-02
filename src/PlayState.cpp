@@ -73,7 +73,7 @@ PlayState::initBullet()
   Ogre::Vector3 pos = Ogre::Vector3(0,10,5);
   Ogre::Vector3 dir = Ogre::Vector3(0,0,0);
 
-  int fuerza = 5;
+  int fuerza = 2;
   
   Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -90,10 +90,10 @@ PlayState::initBullet()
 
   _player_rb->setShape(_player, bodyShape,
          0.6 /* Restitucion */, 0.6 /* Friccion */,
-         5.0 /* Masa */, pos /* Posicion inicial */,
+         10.0 /* Masa */, pos /* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
-  _player_rb->setLinearVelocity(dir * fuerza);
+  //_player_rb->setLinearVelocity(dir * fuerza);
 
   _shapes.push_back(bodyShape);   _bodies.push_back(_player_rb);
 }
@@ -173,7 +173,7 @@ void PlayState::removeLevel()
 
 void PlayState::updatePlayer()
 {
-  int vel = 1;
+  double vel = 0.25;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
   bool move = false;
   if(_arriba){
@@ -259,6 +259,8 @@ PlayState::frameStarted
     Ogre::Real(_viewport->getActualHeight()));
   _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 10));
   _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);
+
+  std::cout  << _player->getPosition().y << std::endl;
 
   return true;
 }
