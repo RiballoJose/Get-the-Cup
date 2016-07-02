@@ -166,7 +166,6 @@ void PlayState::loadLevel()
 
     Ogre::SceneNode* l1_n1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
     Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Cup.mesh");
-    l1_e1->setMaterialName("Oro");
     l1_n1->attachObject(l1_e1);
     _cups.push_back(l1_n1);
     Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
