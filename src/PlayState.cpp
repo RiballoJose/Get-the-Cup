@@ -117,7 +117,7 @@ PlayState::createScene()
   _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
-  _world->setShowDebugShapes (true);  // Muestra los collision shapes
+  _world->setShowDebugShapes (false);  // Muestra los collision shapes
 
   
   _meta_n = _sceneMgr->getRootSceneNode()->createChildSceneNode("Meta", Ogre::Vector3(0,1.5,-18.5));
@@ -168,14 +168,14 @@ void PlayState::loadLevel()
     Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n1->attachObject(l1_e1);
     _cups.push_back(l1_n1);
-  /*  Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
+    Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
     Ogre::Entity* l1_e2 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n2->attachObject(l1_e2);
     _cups.push_back(l1_n2);
     Ogre::SceneNode* l1_n3 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_3", Ogre::Vector3(3,1.5,-12.5));
     Ogre::Entity* l1_e3 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n3->attachObject(l1_e3);
-    _cups.push_back(l1_n3);*/
+    _cups.push_back(l1_n3);
     
     _meta_n->setPosition(0,1.5,-18.5);
   }
