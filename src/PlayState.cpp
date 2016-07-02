@@ -77,7 +77,7 @@ PlayState::initBullet()
   int fuerza = 5;
 
 /* Creacion de la entidad y del SceneNode */
-  Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+  /*Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
   50, 50, 20, 20, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
@@ -88,18 +88,16 @@ PlayState::initBullet()
   node->attachObject(groundEnt);
   _sceneMgr->getRootSceneNode()->addChild(node);
 
-  /* Creamos forma de colision para el plano */ 
-   OgreBulletCollisions::CollisionShape *Shape;
+  OgreBulletCollisions::CollisionShape *Shape;
   Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
     (Ogre::Vector3::UNIT_Y, 0);
   OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
     OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
 
-  /* Creamos la forma estatica (forma, Restitucion, Friccion) */
    rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8);
 
-  /* Anadimos los objetos Shape y RigidBody */
-  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
+  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
+  
   Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
   _player->attachObject(entity);
@@ -143,115 +141,51 @@ PlayState::createScene()
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
   _world->setShowDebugShapes (false);  // Muestra los collision shapes
+  
+  Ogre::Entity* ent =  _sceneMgr->createEntity("Level1.mesh");
+  Ogre::SceneNode* nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode("Level1", Ogre::Vector3::ZERO);
+  nodo->attachObject(ent);
+  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+  OgreBulletCollisions::CollisionShape *level_sh = trimeshConverter->createConvex();
+  OgreBulletDynamics::RigidBody *level_rb = new OgreBulletDynamics::RigidBody("Level1", _world);
+  level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3::ZERO, Ogre::Quaternion/*(1.0,1.0,1.0,1.0)*/::IDENTITY);
+  level_rb->setGravity(0.0,0.0,0.0);
+  level_rb->setKinematicObject(true);
+  _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
 }
 
 void PlayState::loadLevel(int l)
 {
-  Ogre::Entity* ent = NULL;
-  Ogre::SceneNode* nodo = NULL;
-  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL;
-  OgreBulletCollisions::CollisionShape *bodyShape = NULL;
-  OgreBulletDynamics::RigidBody *rigidBody = NULL;
-  std::stringstream bloq, material, rb;
-  bloq.str(""); material.str(""); rb.str("");
 
-  
-  std::stringstream level;
-  std::string line;
-  int x, y, z, type;
-  level << "level_" << l << ".txt";
-  std::ifstream file;
-  file.open("level_1.txt");//level.str());
-  int i = 0;
-  
-  if(file.is_open()){
-    while(getline(file, line))
-      {
-	if(*line.begin()!=35)
-	  {
-	    x = y = z = type = -1;
-	    for(std::string::iterator it = line.begin(); it != line.end(); ++it)
-	      {
-		if(*it==40)
-		  {
-		    x = (*(++it)-48); ++it; y = (*(++it)-48); ++it; z = (*(++it)-48)+13*(-i); ++it; type = (*(++it)-48); ++it;
-		    bloq << "Cube_" <</* type << "_" <<*/ i++;
-		    nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode(bloq.str(), Ogre::Vector3(x,y,z));
-		    switch(type)
-		      {
-		      case 0:
-			ent = _sceneMgr->createEntity("Base.mesh");
-			//break;
-		      case 1:
-			ent = _sceneMgr->createEntity("Base.mesh");
-			//break;
-		      case 2:
-			ent = _sceneMgr->createEntity("Base.mesh");
-			//break;
-		      default:
-			nodo->attachObject(ent);
-		      }
-		    
-		    rb << "RigidBody_" << i;
-
-		    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
-		    bodyShape = trimeshConverter->createConvex();
-		    rigidBody = new OgreBulletDynamics::RigidBody(rb.str(), _world);
-		    rigidBody->setStaticShape(nodo, bodyShape,
-					      0.6, 1.0 , /*5.0,*/ Ogre::Vector3(x,y,z), Ogre::Quaternion/*(1.0,1.0,1.0,1.0)*/::IDENTITY);
-		    rigidBody->setGravity(0.0,0.0,0.0);
-		    //rigidBody->setKinematicObject(true);
-		    _shapes.push_back(bodyShape);   _bodies.push_back(rigidBody);
-		    //break;
-		  }
-		i++;
-		//break;
-	      }
-	    //break;
-	  }
-	//std::cout << std::endl;
-      }
-    file.close();
-  }
 }
 
 void PlayState::updatePlayer(){
-  int vel = 5;
+  int vel = 1;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
-  //btVector3 av = btVector3(0,0,0);
   bool move = false;
   if(_arriba){
     lv+=Ogre::Vector3(0,0,-1*vel);
     move = true;
-    /*_player_rb->enableActiveState();
-    _player_rb->applyForce(Ogre::Vector3(0, 0, -20), _player->getPosition());*/
   }
   if(_abajo){
     lv+=Ogre::Vector3(0,0,1*vel);
     move = true;
-  /*_player_rb->enableActiveState();
-  _player_rb->applyForce(Ogre::Vector3(0, 0, 20), _player->getPosition());*/
   }
   if(_izquierda){
-    //av+=btVector3(0,1*vel,0);
     lv+=Ogre::Vector3(-1*vel,0,0);
     move = true;
-    /*_player_rb->enableActiveState();
-    //_player_rb->applyForce(Ogre::Vector3(-100, 0, 0), _player->getPosition());
-    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,2,0));//->applyTorque(btVector3(0, 2, 0));*/
   }
   if(_derecha){
-    //av+=btVector3(0,-1*vel,0);
     lv+=Ogre::Vector3(1*vel,0,0);
     move = true;
-    /*_player_rb->enableActiveState();
-    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,-2,0));//applyTorque(btVector3(0, -2, 0));
-    //_player_rb->applyForce(Ogre::Vector3(100, 0, 0), _player->getPosition());*/
+  }
+  if(_salto && _player_rb->getCenterOfMassPosition().y < 1.5){
+    lv+=Ogre::Vector3(0,0.5*vel,0);
+    move = true;
   }
   if(move){
     _player_rb->enableActiveState();
-    _player_rb->applyForce(lv, _player->getPosition());
-    ///_player_rb->getBulletRigidBody()->setAngularFactor(av);
+    _player_rb->applyImpulse(lv, _player_rb->getCenterOfMassPosition());
   }
 }
 
@@ -307,7 +241,6 @@ PlayState::keyPressed
   case OIS::KC_SPACE:
     _salto=true;
     break;
-  case OIS::KC_DOWN:
   case OIS::KC_S:
     _abajo = true;
     break;
