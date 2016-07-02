@@ -117,7 +117,7 @@ PlayState::createScene()
   _world = new OgreBulletDynamics::DynamicsWorld(_sceneMgr,
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
-  _world->setShowDebugShapes (false);  // Muestra los collision shapes
+  _world->setShowDebugShapes (true);  // Muestra los collision shapes
 
   
   _meta_n = _sceneMgr->getRootSceneNode()->createChildSceneNode("Meta", Ogre::Vector3(0,1.5,-18.5));
@@ -130,27 +130,51 @@ void PlayState::loadLevel()
 {
   std::stringstream blq; blq.str("");
   if(_currentLevel==1){
-    Ogre::Entity* ent_l1 =  _sceneMgr->createEntity("Level1.mesh");
-    Ogre::SceneNode* nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Level1", Ogre::Vector3(0,0,-17));
+    Ogre::Entity* ent_l1 =  _sceneMgr->createEntity("Plat_big.mesh");
+    Ogre::SceneNode* nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l11", Ogre::Vector3(0,0,-17));
     nodo_l1->attachObject(ent_l1);
     OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
     OgreBulletCollisions::CollisionShape *level1_sh = trimeshConverter->createConvex();
-    OgreBulletDynamics::RigidBody *level1_rb = new OgreBulletDynamics::RigidBody("Level1", _world);
+    OgreBulletDynamics::RigidBody *level1_rb = new OgreBulletDynamics::RigidBody("l11", _world);
     level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-17), Ogre::Quaternion::IDENTITY);
     level1_rb->setGravity(0.0,0.0,0.0);
     level1_rb->setKinematicObject(true);
     _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
 
+    ent_l1 =  _sceneMgr->createEntity("Hall1.mesh");
+    ent_l1->setMaterialName("Level");
+    nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l12", Ogre::Vector3(0,0,-7));
+    nodo_l1->attachObject(ent_l1);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
+    level1_sh = trimeshConverter->createConvex();
+    level1_rb = new OgreBulletDynamics::RigidBody("l12", _world);
+    level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-7), Ogre::Quaternion::IDENTITY);
+    level1_rb->setGravity(0.0,0.0,0.0);
+    level1_rb->setKinematicObject(true);
+    _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
+
+    ent_l1 =  _sceneMgr->createEntity("Plat_big.mesh");
+    nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l13", Ogre::Vector3(0,0,3));
+    nodo_l1->attachObject(ent_l1);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
+    level1_sh = trimeshConverter->createConvex();
+    level1_rb = new OgreBulletDynamics::RigidBody("l13", _world);
+    level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,3), Ogre::Quaternion::IDENTITY);
+    level1_rb->setGravity(0.0,0.0,0.0);
+    level1_rb->setKinematicObject(true);
+    _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
+
     Ogre::SceneNode* l1_n1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
-    Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Muro.mesh");
+    Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Cup.mesh");
+    l1_e1->setMaterialName("Oro");
     l1_n1->attachObject(l1_e1);
     _cups.push_back(l1_n1);
     Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
-    Ogre::Entity* l1_e2 =  _sceneMgr->createEntity("Muro.mesh");
+    Ogre::Entity* l1_e2 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n2->attachObject(l1_e2);
     _cups.push_back(l1_n2);
     Ogre::SceneNode* l1_n3 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_3", Ogre::Vector3(3,1.5,-12.5));
-    Ogre::Entity* l1_e3 =  _sceneMgr->createEntity("Muro.mesh");
+    Ogre::Entity* l1_e3 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n3->attachObject(l1_e3);
     _cups.push_back(l1_n3);
     
@@ -236,14 +260,14 @@ void PlayState::detectCollisions()
     }
   }
   nodo = NULL;
-  try{nodo = _sceneMgr->getSceneNode("Meta");}catch(...){}
+/*  try{nodo = _sceneMgr->getSceneNode("Meta");}catch(...){}
   if(nodo){
     Ogre::AxisAlignedBox bboxPac = _player->_getWorldAABB();
     Ogre::AxisAlignedBox bboxDot = nodo->_getWorldAABB();
     if(bboxPac.intersects(bboxDot)){
       _nextLevel = true;
     }
-  }
+  }*/
 }
 
 bool
