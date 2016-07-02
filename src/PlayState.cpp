@@ -164,18 +164,18 @@ void PlayState::loadLevel()
     level1_rb->setKinematicObject(true);
     _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
 
-    Ogre::SceneNode* l1_n1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
+   Ogre::SceneNode* l1_n1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
     Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n1->attachObject(l1_e1);
     _cups.push_back(l1_n1);
-    Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
+  /*  Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
     Ogre::Entity* l1_e2 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n2->attachObject(l1_e2);
     _cups.push_back(l1_n2);
     Ogre::SceneNode* l1_n3 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_3", Ogre::Vector3(3,1.5,-12.5));
     Ogre::Entity* l1_e3 =  _sceneMgr->createEntity("Cup.mesh");
     l1_n3->attachObject(l1_e3);
-    _cups.push_back(l1_n3);
+    _cups.push_back(l1_n3);*/
     
     _meta_n->setPosition(0,1.5,-18.5);
   }

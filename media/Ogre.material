@@ -18,6 +18,7 @@ material Ogre/Earring
 	}
 }
 
+
 material Ogre/Skin
 {
 	technique
