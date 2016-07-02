@@ -1,5 +1,6 @@
 #include "PlayState.h"
 #include "PauseState.h"
+#include "NextLevelState.h"
 
 template<> PlayState* Ogre::Singleton<PlayState>::msSingleton = 0;
 
@@ -18,9 +19,9 @@ PlayState::enter ()
   initLights();
   createScene();
   initBullet();
-  loadLevel(1);
-  
-  _exitGame = false;
+  _currentLevel = 1;
+  loadLevel();
+  _exitGame = _nextLevel = false;
 }
 
 void
@@ -56,8 +57,6 @@ PlayState::initLights()
   _light->setDirection(Ogre::Vector3(1,-1,0));
   _light->setSpotlightInnerAngle(Ogre::Degree(25.0f));
   _light->setSpotlightOuterAngle(Ogre::Degree(60.0f));
-  //_light->setSpecularColour(0.9, 0.9, 0.9);
-  //_light->setDiffuseColour(0.8, 0.8, 0.8);
   _light->setSpotlightFalloff(0.0f);
   _light->setCastShadows(true);
 
@@ -75,28 +74,6 @@ PlayState::initBullet()
   Ogre::Vector3 dir = Ogre::Vector3(0,0,0);
 
   int fuerza = 5;
-
-/* Creacion de la entidad y del SceneNode */
-  /*Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
-  Ogre::MeshManager::getSingleton().createPlane("p1",
-  Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
-  50, 50, 20, 20, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
-  Ogre::SceneNode* node = _sceneMgr->createSceneNode("Ground");
-  Ogre::Entity* groundEnt = _sceneMgr->createEntity("Base", "p1");
-  groundEnt->setCastShadows(false);
-  groundEnt->setMaterialName("Ground");
-  node->attachObject(groundEnt);
-  _sceneMgr->getRootSceneNode()->addChild(node);
-
-  OgreBulletCollisions::CollisionShape *Shape;
-  Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
-    (Ogre::Vector3::UNIT_Y, 0);
-  OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
-    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
-
-   rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8);
-
-  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
   
   Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -141,25 +118,61 @@ PlayState::createScene()
      worldBounds, gravity);
   _world->setDebugDrawer (_debugDrawer);
   _world->setShowDebugShapes (false);  // Muestra los collision shapes
+
   
-  Ogre::Entity* ent =  _sceneMgr->createEntity("Level1.mesh");
-  Ogre::SceneNode* nodo = _sceneMgr->getRootSceneNode()->createChildSceneNode("Level1", Ogre::Vector3::ZERO);
-  nodo->attachObject(ent);
-  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
-  OgreBulletCollisions::CollisionShape *level_sh = trimeshConverter->createConvex();
-  OgreBulletDynamics::RigidBody *level_rb = new OgreBulletDynamics::RigidBody("Level1", _world);
-  level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3::ZERO, Ogre::Quaternion/*(1.0,1.0,1.0,1.0)*/::IDENTITY);
-  level_rb->setGravity(0.0,0.0,0.0);
-  level_rb->setKinematicObject(true);
-  _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
+  _meta_n = _sceneMgr->getRootSceneNode()->createChildSceneNode("Meta", Ogre::Vector3(0,1.5,-18.5));
+  _meta_e =  _sceneMgr->createEntity("Muro.mesh");
+  _meta_n->setScale(0.5, 0.5, 0.1);
+  _meta_n->attachObject(_meta_e);
 }
 
-void PlayState::loadLevel(int l)
+void PlayState::loadLevel()
+{
+  std::stringstream blq; blq.str("");
+  if(_currentLevel==1){
+    Ogre::Entity* ent_l1 =  _sceneMgr->createEntity("Level1.mesh");
+    Ogre::SceneNode* nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Level1", Ogre::Vector3(0,0,-17));
+    nodo_l1->attachObject(ent_l1);
+    OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
+    OgreBulletCollisions::CollisionShape *level1_sh = trimeshConverter->createConvex();
+    OgreBulletDynamics::RigidBody *level1_rb = new OgreBulletDynamics::RigidBody("Level1", _world);
+    level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-17), Ogre::Quaternion::IDENTITY);
+    level1_rb->setGravity(0.0,0.0,0.0);
+    level1_rb->setKinematicObject(true);
+    _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
+
+    Ogre::SceneNode* l1_n1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
+    Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Muro.mesh");
+    l1_n1->attachObject(l1_e1);
+    _cups.push_back(l1_n1);
+    Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
+    Ogre::Entity* l1_e2 =  _sceneMgr->createEntity("Muro.mesh");
+    l1_n2->attachObject(l1_e2);
+    _cups.push_back(l1_n2);
+    Ogre::SceneNode* l1_n3 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_3", Ogre::Vector3(3,1.5,-12.5));
+    Ogre::Entity* l1_e3 =  _sceneMgr->createEntity("Muro.mesh");
+    l1_n3->attachObject(l1_e3);
+    _cups.push_back(l1_n3);
+    
+    _meta_n->setPosition(0,1.5,-18.5);
+  }
+  _player->setPosition(0,10,5);
+}
+void PlayState::nextLevel()
+{
+  _currentLevel++;
+  removeLevel();
+  pushState(NextLevelState::getSingletonPtr());
+  loadLevel();
+}
+
+void PlayState::removeLevel()
 {
 
 }
 
-void PlayState::updatePlayer(){
+void PlayState::updatePlayer()
+{
   int vel = 1;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
   bool move = false;
@@ -188,6 +201,50 @@ void PlayState::updatePlayer(){
     _player_rb->applyImpulse(lv, _player_rb->getCenterOfMassPosition());
   }
 }
+void PlayState::detectCollisions()
+{
+  std::stringstream blq; blq.str("Cup");
+  blq << _currentLevel << "_";
+  Ogre::SceneNode* nodo = NULL;
+  try{nodo = _sceneMgr->getSceneNode("Cup1_1");}catch(...){}
+  if(nodo){
+    Ogre::AxisAlignedBox bboxPac = _player->_getWorldAABB();
+    Ogre::AxisAlignedBox bboxDot = nodo->_getWorldAABB();
+    if(bboxPac.intersects(bboxDot)){
+      nodo->removeAndDestroyAllChildren();
+      _sceneMgr->destroySceneNode(nodo);
+    }
+  }
+  nodo = NULL;
+  try{nodo = _sceneMgr->getSceneNode("Cup1_2");}catch(...){}
+  if(nodo){
+    Ogre::AxisAlignedBox bboxPac = _player->_getWorldAABB();
+    Ogre::AxisAlignedBox bboxDot = nodo->_getWorldAABB();
+    if(bboxPac.intersects(bboxDot)){
+      nodo->removeAndDestroyAllChildren();
+      _sceneMgr->destroySceneNode(nodo);
+    }
+  }
+  nodo = NULL;
+  try{nodo = _sceneMgr->getSceneNode("Cup1_3");}catch(...){}
+  if(nodo){
+    Ogre::AxisAlignedBox bboxPac = _player->_getWorldAABB();
+    Ogre::AxisAlignedBox bboxDot = nodo->_getWorldAABB();
+    if(bboxPac.intersects(bboxDot)){
+      nodo->removeAndDestroyAllChildren();
+      _sceneMgr->destroySceneNode(nodo);
+    }
+  }
+  nodo = NULL;
+  try{nodo = _sceneMgr->getSceneNode("Meta");}catch(...){}
+  if(nodo){
+    Ogre::AxisAlignedBox bboxPac = _player->_getWorldAABB();
+    Ogre::AxisAlignedBox bboxDot = nodo->_getWorldAABB();
+    if(bboxPac.intersects(bboxDot)){
+      _nextLevel = true;
+    }
+  }
+}
 
 bool
 PlayState::frameStarted
@@ -196,20 +253,12 @@ PlayState::frameStarted
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
   updatePlayer();
+  detectCollisions();
   _camera->setAspectRatio
    (Ogre::Real(_viewport->getActualWidth())/
     Ogre::Real(_viewport->getActualHeight()));
   _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 10));
   _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);
-
-  //std::cout << _player->getPosition().y << std::endl;
-  
-  /*_player_rb->setOrientation(_camera->getOrientation().w, 0*_camera->getOrientation().x,
-    _camera->getOrientation().y, 0*_camera->getOrientation().z);*/
-  
-  Ogre::Vector3 movement(0, 0, 0);
-  //Ogre::Vector3 direction = _player->getOrientation() * Ogre::Vector3::NEGATIVE_UNIT_Z;
-  //direction.normalise();
 
   return true;
 }
@@ -224,6 +273,9 @@ PlayState::frameEnded
   if(_exitGame)
     return false;
 
+  if(_nextLevel)
+    nextLevel();
+  
   //std::cout << _player->getPosition().y << std::endl;
   if(_jump && _player_rb->getLinearVelocity().y<0.05 && _player->getPosition().y <1.1)
     _jump = false;
@@ -295,16 +347,12 @@ void
 PlayState::mousePressed
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-  if(OIS::MB_Right)
-    _arriba = true;
 }
 
 void
 PlayState::mouseReleased
 (const OIS::MouseEvent &e, OIS::MouseButtonID id)
 {
-  if(OIS::MB_Right)
-    _arriba = false;
 }
 
 PlayState*

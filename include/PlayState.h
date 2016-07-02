@@ -67,7 +67,10 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void initLights();
   void initBullet();
   void updatePlayer();
-  void loadLevel(int l);
+  void detectCollisions();
+  void loadLevel();
+  void nextLevel();
+  void removeLevel();
 
  protected:
   Ogre::Root* _root;
@@ -90,9 +93,13 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   
   Ogre::SceneNode* _player;
   Ogre::SceneNode* _level;
-  OgreBulletDynamics::RigidBody *_player_rb;
+  Ogre::SceneNode* _meta_n;
+  Ogre::Entity* _meta_e;
+  std::deque <Ogre::SceneNode*> _cups;
   
-  bool _exitGame;
+  OgreBulletDynamics::RigidBody *_player_rb;
+  int _currentLevel;
+  bool _nextLevel, _exitGame;
 };
 
 #endif
