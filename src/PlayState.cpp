@@ -77,7 +77,7 @@ PlayState::initBullet()
   int fuerza = 5;
 
 /* Creacion de la entidad y del SceneNode */
-/*Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
+  Ogre::Plane plane1(Ogre::Vector3::UNIT_Y, 0);
   Ogre::MeshManager::getSingleton().createPlane("p1",
   Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane1,
   50, 50, 20, 20, true, 1, 20, 20, Ogre::Vector3::UNIT_Z);
@@ -89,17 +89,17 @@ PlayState::initBullet()
   _sceneMgr->getRootSceneNode()->addChild(node);
 
   /* Creamos forma de colision para el plano */ 
-  /* OgreBulletCollisions::CollisionShape *Shape;
+   OgreBulletCollisions::CollisionShape *Shape;
   Shape = new OgreBulletCollisions::StaticPlaneCollisionShape
     (Ogre::Vector3::UNIT_Y, 0);
   OgreBulletDynamics::RigidBody *rigidBodyPlane = new 
-    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);/
+    OgreBulletDynamics::RigidBody("rigidBodyPlane", _world);
 
   /* Creamos la forma estatica (forma, Restitucion, Friccion) */
-    /* rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8); */
-  
+   rigidBodyPlane->setStaticShape(Shape, 0.1, 0.8);
+
   /* Anadimos los objetos Shape y RigidBody */
-  /*_shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);*/
+  _shapes.push_back(Shape);      _bodies.push_back(rigidBodyPlane);
   Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
   _player->attachObject(entity);
