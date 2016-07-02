@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout version="4">
+  <Window type="TaharezLook/FrameWindow" name="Menu" >
+    <Property name="Text" value="Menu" />
+    <Property name="TitlebarFont" value="DejaVuSans-12" />
+    <Property name="TitlebarEnabled" value="True" />
+    <Property name="Area" value="{{0.25,0},{0.2,0},{0.75,0},{0.8,0}}" />
+    <!-- Play button -->
+    <Window type="TaharezLook/Button" name="PlayButton" >
+      <Property name="Text" value="Start next Level" />
+      <Property name="Area" value="{{0.25,0},{0.1,0},{0.75,0},{0.2,0}}" />
+    </Window>
+    <!-- Settings button -->
+    <Window type="TaharezLook/Button" name="HelpButton" >
+      <Property name="Text" value="Help" />
+      <Property name="Area" value="{{0.25,0},{0.55,0},{0.75,0},{0.65,0}}" />
+    </Window>
+    <Window type="TaharezLook/Button" name="MenuButton" >
+      <Property name="Text" value="Menu" />
+      <Property name="Area" value="{{0.25,0},{0.7,0},{0.75,0},{0.8,0}}" />
+    </Window>
+    <!-- Exit button -->
+    <Window type="TaharezLook/Button" name="ExitButton" >
+      <Property name="Text" value="Exit" />
+      <Property name="Area" value="{{0.25,0},{0.85,0},{0.75,0},{0.95,0}}" />
+    </Window>
+  </Window>
+</GUILayout>
