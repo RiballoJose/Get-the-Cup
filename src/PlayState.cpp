@@ -93,7 +93,7 @@ PlayState::initBullet()
 void
 PlayState::createScene()
 {
-  
+  _sceneMgr->setSkyDome(true, "Sky", 5, 8);
   Ogre::SceneNode* node = NULL;
   /* Fisica */
   _debugDrawer = new OgreBulletCollisions::DebugDrawer();
