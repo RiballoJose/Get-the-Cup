@@ -155,6 +155,7 @@ PlayState::createScene()
   _meta_n = _sceneMgr->getRootSceneNode()->createChildSceneNode("Meta", Ogre::Vector3(0,1.5,-18.5));
   _meta_e =  _sceneMgr->createEntity("Muro.mesh");
   _meta_n->attachObject(_meta_e);
+  _meta_n->setVisible(false);//setScale(4, 2, 0.1);
   _meta_e =  _sceneMgr->createEntity("Goal.mesh");
   _meta_n->roll(Degree(-90));
    _meta_n->pitch(Degree(90));
