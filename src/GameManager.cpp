@@ -27,7 +27,10 @@ GameManager::start
 {
   // Creación del objeto Ogre::Root.
   _root = new Ogre::Root();
-  
+  //Iniciamos SDL
+  initSDL();
+  //Iniciamos Overlays
+  _overlaySystem = new Ogre::OverlaySystem();
   loadResources();
 
   if (!configure())
@@ -54,13 +57,9 @@ GameManager::start
   CEGUI::SchemeManager::getSingleton().createFromFile("TaharezLook.scheme");
   CEGUI::System::getSingleton().getDefaultGUIContext().setDefaultFont("DejaVuSans-12");
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setDefaultImage("TaharezLook/MouseArrow");
-  //Iniciamos SDL
-  initSDL();
   _pTrackManager=new TrackManager();
   _pSoundFXManager=new SoundFXManager();
   
-  //Iniciamos Overlays
-  //_overlaySystem = new Ogre::OverlaySystem();
   
   // Transición al estado inicial.
   changeState(state);

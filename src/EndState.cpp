@@ -23,7 +23,7 @@ EndState::enter ()
   //Config Window
   CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("end.layout");
   CEGUI::Window* mark = configWin->getChild("MarkValue");
-  mark->setText("**Puntuacion");
+  mark->setText(Ogre::StringConverter::toString(_score));
   _nick = configWin->getChild("Nick");
   _nick->subscribeEvent(CEGUI::Window::EventMouseButtonDown,
 			CEGUI::Event::Subscriber(&EndState::clear, this));
@@ -69,6 +69,9 @@ bool EndState::quit(const CEGUI::EventArgs &e)
 {
   _exitGame = true;
   return true;
+}
+void EndState::addScore(int score){
+  _score = score;
 }
 
 bool EndState::frameStarted(const Ogre::FrameEvent& evt)

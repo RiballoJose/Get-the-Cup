@@ -3,6 +3,7 @@
 
 #include <Ogre.h>
 #include <OIS/OIS.h>
+#include <string>
 
 #include "Record.h"
 #include "GameState.h"
@@ -26,6 +27,7 @@ class EndState : public Ogre::Singleton<EndState>, public GameState{
   bool clear(const CEGUI::EventArgs &e);
   bool save(const CEGUI::EventArgs &e);
   bool quit(const CEGUI::EventArgs &e);
+  void addScore(int score);
   
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
@@ -46,6 +48,7 @@ class EndState : public Ogre::Singleton<EndState>, public GameState{
   SoundFXManager* _pSoundFXManager;
         
  private:
+  int _score;
   bool _exitGame, _save;
 };
 

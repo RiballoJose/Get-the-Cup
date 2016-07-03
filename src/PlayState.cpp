@@ -16,8 +16,15 @@ PlayState::enter ()
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
   _viewport->setClearEveryFrame(true);
   _viewport->setOverlaysEnabled(false);
+
+  _currentLevel = 1; _lives = 3; _stops = 0; _score = 0;
+  _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = false;
+  
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
   initLights();
+  _sceneMgr->addRenderQueueListener(GameManager::getSingletonPtr()->getOverlaySystem());
+  _overlayManager = Ogre::OverlayManager::getSingletonPtr();
+  createOverlay();
   _pTrackManager = TrackManager::getSingletonPtr();
   _pSoundFXManager = SoundFXManager::getSingletonPtr();
   _mainTrack = _pTrackManager->load("music.ogg");
@@ -25,15 +32,14 @@ PlayState::enter ()
   _simpleEffect = _pSoundFXManager->load("aplausos.ogg");
   createScene();
   initBullet();
-  _currentLevel = 1; _lives = 3; _stops = 0;
   loadLevel();
-  _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = false;
   
 }
 
 void
 PlayState::exit ()
 {
+  //_ovJuego->hide(); 
   _sceneMgr->clearScene();
   _mainTrack->stop();
   _root->getAutoCreatedWindow()->removeAllViewports();
@@ -42,13 +48,15 @@ PlayState::exit ()
 void
 PlayState::pause()
 {
+  _ovJuego->hide();
 }
 
 void
 PlayState::resume()
 {
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
-  resetLevel();
+  _ovJuego->show();
+  //resetBall();
 }
 
 void
@@ -70,6 +78,19 @@ PlayState::initLights()
   _light->setCastShadows(true);
   _camera->setNearClipDistance(1);
   _camera->setFOVy(Ogre::Degree(38));
+}
+
+void 
+PlayState::createOverlay()
+{
+  _ovJuego = _overlayManager->getByName("Juego");
+  _ovPunt = _overlayManager->getOverlayElement("Puntuacion");
+  _ovVida = _overlayManager->getOverlayElement("Vida");
+  _ovScore = _overlayManager->getOverlayElement("Puntos");
+  _ovVida->setCaption("Vidas");
+  _ovPunt->setCaption("Puntos");
+  std::cout << "Overlays" << std::endl;
+  try{_ovJuego->show();} catch(...){std::cout << "Overlay error" << std::endl;}
 }
 
 void
@@ -203,6 +224,8 @@ void PlayState::removeLevel()
 
 void PlayState::died()
 {
+  std::cout << _score << std::endl;
+  EndState::getSingletonPtr()->addScore(_score);
   pushState(EndState::getSingletonPtr());
 }
 
@@ -255,6 +278,7 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
+      _score += 50;
       try{
 	_simpleEffect->play();
       }
@@ -269,6 +293,7 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
+      _score += 50;
       try{
 	_simpleEffect->play();
       }
@@ -283,6 +308,7 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
+      _score += 50;
       try{
 	_simpleEffect->play();
       }
@@ -308,6 +334,8 @@ PlayState::frameStarted
   _world->stepSimulation(_deltaT);
   updatePlayer();
   detectCollisions();
+  if(_score)
+    _ovScore->setCaption(Ogre::StringConverter::toString(_score));
   _camera->setAspectRatio
    (Ogre::Real(_viewport->getActualWidth())/
     Ogre::Real(_viewport->getActualHeight()));

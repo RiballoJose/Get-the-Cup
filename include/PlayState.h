@@ -72,6 +72,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void resetLevel();
   void removeLevel();
   void died();
+  void createOverlay();
+  
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneMgr;
@@ -99,9 +101,13 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Entity* _ball_ent;
   OgreBulletCollisions::SphereCollisionShape *_ball_sh;
   OgreBulletDynamics::RigidBody *_player_rb;
-  int _currentLevel, _lives, _stops;
+  int _currentLevel, _lives, _stops, _score;
   bool _nextLevel, _exitGame, _noLives, _resetLevel, _stopBall;
 
+  Ogre::OverlayManager* _overlayManager;
+  Ogre::Overlay *_ovJuego;
+  Ogre::OverlayElement *_ovPunt, *_ovVida, *_ovScore;
+  
   TrackPtr _mainTrack;
   SoundFXPtr _simpleEffect;
   TrackManager* _pTrackManager;
