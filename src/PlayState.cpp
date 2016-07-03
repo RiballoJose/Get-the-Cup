@@ -25,9 +25,9 @@ PlayState::enter ()
   _simpleEffect = _pSoundFXManager->load("aplausos.ogg");
   createScene();
   initBullet();
-  _currentLevel = 1; _lives = 3;
+  _currentLevel = 1; _lives = 3; _stops = 0;
   loadLevel();
-  _exitGame = _nextLevel = _noLives = _resetLevel = false;
+  _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = false;
   
 }
 
@@ -171,6 +171,7 @@ void PlayState::loadLevel()
     _cups.push_back(l1_n3);
     
     _meta_n->setPosition(0,1.5,-18.5);
+    _stops = 1;
   }
 }
 void PlayState::nextLevel()
@@ -208,6 +209,12 @@ void PlayState::died()
 
 void PlayState::updatePlayer()
 {
+  if(_stopBall){
+    _player_rb->getBulletRigidBody()->clearForces();
+    _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
+    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
+    _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
+  }
   double vel = 10.0*_deltaT;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
   bool move = false;
@@ -357,6 +364,11 @@ PlayState::keyPressed
   case OIS::KC_W:
     _arriba = true;
     break;
+  case OIS::KC_LSHIFT:
+    if(_stops>0){
+      _stops--; _stopBall = true;
+    }
+    break;
   default:
   break;
   }
@@ -381,6 +393,9 @@ PlayState::keyReleased
     break;
   case OIS::KC_SPACE:
     _salto = false;
+    break;
+  case OIS::KC_LSHIFT:
+    _stopBall = false;
     break;
   default:
     break;

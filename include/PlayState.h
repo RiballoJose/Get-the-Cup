@@ -99,8 +99,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Entity* _ball_ent;
   OgreBulletCollisions::SphereCollisionShape *_ball_sh;
   OgreBulletDynamics::RigidBody *_player_rb;
-  int _currentLevel, _lives;
-  bool _nextLevel, _exitGame, _noLives, _resetLevel;
+  int _currentLevel, _lives, _stops;
+  bool _nextLevel, _exitGame, _noLives, _resetLevel, _stopBall;
 
   TrackPtr _mainTrack;
   SoundFXPtr _simpleEffect;
