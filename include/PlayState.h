@@ -81,7 +81,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Camera* _camera;
   Ogre::Light* _light;
 
-  Ogre::Real _deltaT;
+  Ogre::Real _deltaT, _time;
 
   bool _derecha, _arriba, _abajo, _izquierda, _salto, _jump;
 
@@ -107,7 +107,9 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::OverlayManager* _overlayManager;
   Ogre::Overlay *_ovJuego;
   Ogre::OverlayElement *_ovPunt, *_ovVida, *_ovScore;
-  
+
+  CEGUI::Window* _sheet,*_scoreWin, *_livesWin, *_timeWin;
+
   TrackPtr _mainTrack;
   SoundFXPtr _simpleEffect;
   TrackManager* _pTrackManager;

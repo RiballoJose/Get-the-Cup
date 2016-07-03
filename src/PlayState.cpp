@@ -17,13 +17,13 @@ PlayState::enter ()
   _viewport->setClearEveryFrame(true);
   _viewport->setOverlaysEnabled(false);
 
-  _currentLevel = 1; _lives = 3; _stops = 0; _score = 0;
+  _currentLevel = 1; _lives = 3; _stops = 0; _score = 0; _time = 0;
   _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = false;
   
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
   initLights();
-  _sceneMgr->addRenderQueueListener(GameManager::getSingletonPtr()->getOverlaySystem());
-  _overlayManager = Ogre::OverlayManager::getSingletonPtr();
+  //_sceneMgr->addRenderQueueListener(GameManager::getSingletonPtr()->getOverlaySystem());
+  //_overlayManager = Ogre::OverlayManager::getSingletonPtr();
   createOverlay();
   _pTrackManager = TrackManager::getSingletonPtr();
   _pSoundFXManager = SoundFXManager::getSingletonPtr();
@@ -39,7 +39,6 @@ PlayState::enter ()
 void
 PlayState::exit ()
 {
-  //_ovJuego->hide(); 
   _sceneMgr->clearScene();
   _mainTrack->stop();
   _root->getAutoCreatedWindow()->removeAllViewports();
@@ -48,14 +47,14 @@ PlayState::exit ()
 void
 PlayState::pause()
 {
-  _ovJuego->hide();
 }
 
 void
 PlayState::resume()
 {
+  _sheet->show();
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
-  _ovJuego->show();
   //resetBall();
 }
 
@@ -83,14 +82,31 @@ PlayState::initLights()
 void 
 PlayState::createOverlay()
 {
-  _ovJuego = _overlayManager->getByName("Juego");
+  /*_ovJuego = _overlayManager->getByName("Juego");
   _ovPunt = _overlayManager->getOverlayElement("Puntuacion");
   _ovVida = _overlayManager->getOverlayElement("Vida");
   _ovScore = _overlayManager->getOverlayElement("Puntos");
   _ovVida->setCaption("Vidas");
   _ovPunt->setCaption("Puntos");
   std::cout << "Overlays" << std::endl;
-  try{_ovJuego->show();} catch(...){std::cout << "Overlay error" << std::endl;}
+  try{_ovJuego->show();} catch(...){std::cout << "Overlay error" << std::endl;}*/
+
+  _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Play");
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("play_score.layout");
+  _scoreWin = configWin->getChild("Score");
+  _sheet->addChild(configWin);
+  _scoreWin->setText(Ogre::StringConverter::toString(_score));
+  
+  CEGUI::Window* configWin2 = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("play_lives.layout");
+  _livesWin = configWin2->getChild("Lives");
+  _sheet->addChild(configWin2);
+  _livesWin->setText(Ogre::StringConverter::toString(_lives));
+  
+  CEGUI::Window* configWin3 = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("timer.layout");
+  _timeWin = configWin3->getChild("Time");
+  _sheet->addChild(configWin3);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
+  _timeWin->setText(Ogre::StringConverter::toString(_time));
 }
 
 void
@@ -209,7 +225,7 @@ void PlayState::nextLevel()
 
 void PlayState::resetLevel()
 {
-  _lives--;
+  _lives--;_livesWin->setText(Ogre::StringConverter::toString(_lives));
   if(_lives<1){
     _noLives = true;
   }
@@ -283,7 +299,7 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
-      _score += 50;
+      _score += 50;_scoreWin->setText(Ogre::StringConverter::toString(_score));
       try{
 	_simpleEffect->play();
       }
@@ -298,7 +314,7 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
-      _score += 50;
+      _score += 50;_scoreWin->setText(Ogre::StringConverter::toString(_score));
       try{
 	_simpleEffect->play();
       }
@@ -314,6 +330,7 @@ void PlayState::detectCollisions()
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
       _score += 50;
+      _scoreWin->setText(Ogre::StringConverter::toString(_score));
       try{
 	_simpleEffect->play();
       }
@@ -340,7 +357,8 @@ PlayState::frameStarted
   updatePlayer();
   detectCollisions();
   if(_score)
-    _ovScore->setCaption(Ogre::StringConverter::toString(_score));
+    _scoreWin->setText(Ogre::StringConverter::toString(_score));
+    //_ovScore->setCaption(Ogre::StringConverter::toString(_score));
   _camera->setAspectRatio
    (Ogre::Real(_viewport->getActualWidth())/
     Ogre::Real(_viewport->getActualHeight()));
@@ -356,7 +374,9 @@ PlayState::frameEnded
 {
   _deltaT = evt.timeSinceLastFrame;
   _world->stepSimulation(_deltaT);
-
+  _time += _deltaT;
+  _timeWin->setText(Ogre::StringConverter::toString(_time));
+  
   if(_exitGame)
     return false;
 

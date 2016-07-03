@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout version="4">
+  <Window type="TaharezLook/FrameWindow" name="play_score" >
+    <Property name="Text" value="Score" />
+    <Property name="TitlebarFont" value="DejaVuSans-12" />
+    <Property name="TitlebarEnabled" value="True" />
+    <Property name="Area" value="{{0.05,0},{0.1,0},{0.15,0},{0.2,0}}" />
+    <Window type="TaharezLook/StaticText" name="Score" >
+      <Property name="Text" value="" />
+      <Property name="Area" value="{{0.1,0},{0.1,0},{0.9,0},{0.9,0}}" />
+    </Window>
+  </Window>
+</GUILayout>
