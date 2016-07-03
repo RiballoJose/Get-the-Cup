@@ -339,6 +339,12 @@ void PlayState::resetPos()
 }
 void PlayState::removeLevel()
 {
+  std::deque <OgreBulletDynamics::RigidBody *>::iterator 
+        itBody = _bodies.begin()+1;
+    while (_bodies.end() != itBody) {   
+        delete *itBody;  ++itBody;
+    }//Fin while
+
   destroyAllAttachedMovableObjects(_level);
 }
 
@@ -346,6 +352,12 @@ void
 PlayState::destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
 {
    if(!node) return;
+
+   Ogre::SceneNode::ObjectIterator itObject = node->getAttachedObjectIterator();
+
+   while (itObject.hasMoreElements()){
+      node->getCreator()->destroyMovableObject(itObject.getNext());
+   }
 
    Ogre::SceneNode::ChildNodeIterator itChild = node->getChildIterator();
 
@@ -369,7 +381,7 @@ void PlayState::updatePlayer()
     _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
     _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
     _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
-
+  }
   double vel = 15.0*_deltaT;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
   bool move = false;
