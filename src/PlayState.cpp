@@ -41,6 +41,7 @@ PlayState::enter ()
 void
 PlayState::exit ()
 {
+  removeLevel();
   _sceneMgr->clearScene();
   _mainTrack->stop();
   _root->getAutoCreatedWindow()->removeAllViewports();
@@ -126,7 +127,7 @@ PlayState::initBullet()
          7.0 /* Masa */, Ogre::Vector3(0,10,5)/* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
-  _shapes.push_back(_ball_sh);   _bodies.push_back(_player_rb);
+  //_shapes.push_back(_ball_sh);   _bodies.push_back(_player_rb);
 }
 
 void
@@ -279,7 +280,6 @@ void PlayState::loadLevel()
     level_rb->setKinematicObject(true);
     _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
 
-
     nodo = _level->createChildSceneNode("Cup2_1", Ogre::Vector3(0,3,-8.5));
     ent =  _sceneMgr->createEntity("Cup.mesh");
     nodo->attachObject(ent);
@@ -340,10 +340,18 @@ void PlayState::resetPos()
 void PlayState::removeLevel()
 {
   std::deque <OgreBulletDynamics::RigidBody *>::iterator 
-        itBody = _bodies.begin()+1;
+        itBody = _bodies.begin();
     while (_bodies.end() != itBody) {   
         delete *itBody;  ++itBody;
     }//Fin while
+
+   std::deque<OgreBulletCollisions::CollisionShape *>::iterator 
+        itShape = _shapes.begin();
+    while (_shapes.end() != itShape) {   
+        delete *itShape; ++itShape;
+    }//Fin while
+
+    _bodies.clear(); _shapes.clear();
 
   destroyAllAttachedMovableObjects(_level);
 }
