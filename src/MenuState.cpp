@@ -15,6 +15,11 @@ MenuState::enter ()
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
 
+  _pTrackManager = TrackManager::getSingletonPtr();
+  _pSoundFXManager = SoundFXManager::getSingletonPtr();
+  _mainTrack = _pTrackManager->load("menu.ogg");
+  _mainTrack->play();
+  
   createGUI();
   
   _exitGame = false;

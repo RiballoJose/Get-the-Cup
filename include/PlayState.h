@@ -30,8 +30,7 @@
 #include <Shapes/OgreBulletCollisionsConvexHullShape.h>
 #include <Shapes/OgreBulletCollisionsTrimeshShape.h>
 #include <Utils/OgreBulletCollisionsMeshToShapeConverter.h> 
- #include <Shapes/OgreBulletCollisionsSphereShape.h>
-
+#include <Shapes/OgreBulletCollisionsSphereShape.h>
 
 using namespace Ogre;
 using namespace OgreBulletCollisions;
@@ -72,7 +71,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void nextLevel();
   void resetLevel();
   void removeLevel();
-
+  void died();
  protected:
   Ogre::Root* _root;
   Ogre::SceneManager* _sceneMgr;
@@ -100,8 +99,13 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Entity* _ball_ent;
   OgreBulletCollisions::SphereCollisionShape *_ball_sh;
   OgreBulletDynamics::RigidBody *_player_rb;
-  int _currentLevel;
-  bool _nextLevel, _exitGame;
+  int _currentLevel, _lives;
+  bool _nextLevel, _exitGame, _noLives, _resetLevel;
+
+  TrackPtr _mainTrack;
+  SoundFXPtr _simpleEffect;
+  TrackManager* _pTrackManager;
+  SoundFXManager* _pSoundFXManager;
 };
 
 #endif

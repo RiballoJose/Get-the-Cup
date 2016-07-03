@@ -26,6 +26,7 @@
 #include "PlayState.h"
 #include "NextLevelState.h"
 #include "PauseState.h"
+#include "EndState.h"
 
 #include <iostream>
 
@@ -39,12 +40,14 @@ int main () {
   PlayState* playState = new PlayState();
   NextLevelState* nextLevelState = new NextLevelState();
   PauseState* pauseState = new PauseState();
+  EndState* endState = new EndState();
 
   UNUSED_VARIABLE(introState);
   UNUSED_VARIABLE(menuState);
   UNUSED_VARIABLE(playState);
   UNUSED_VARIABLE(nextLevelState);
   UNUSED_VARIABLE(pauseState);
+  UNUSED_VARIABLE(endState);
     
   try
     {

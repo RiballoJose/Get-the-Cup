@@ -19,6 +19,14 @@ class EndState : public Ogre::Singleton<EndState>, public GameState{
   void keyPressed (const OIS::KeyEvent &e);
   void keyReleased (const OIS::KeyEvent &e);
 
+  void mouseMoved(const OIS::MouseEvent &evt);
+  void mousePressed(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+  void mouseReleased(const OIS::MouseEvent &e, OIS::MouseButtonID id);
+
+  bool clear(const CEGUI::EventArgs &e);
+  bool save(const CEGUI::EventArgs &e);
+  bool quit(const CEGUI::EventArgs &e);
+  
   bool frameStarted (const Ogre::FrameEvent& evt);
   bool frameEnded (const Ogre::FrameEvent& evt);
 
@@ -30,9 +38,15 @@ class EndState : public Ogre::Singleton<EndState>, public GameState{
   Ogre::SceneManager* _sceneMgr;
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
+
+  CEGUI::Window* _sheet;
+  CEGUI::Window* _nick;
+  
+  SoundFXPtr _simpleEffect;
+  SoundFXManager* _pSoundFXManager;
         
  private:
-  bool _endGame;
+  bool _exitGame, _save;
 };
 
 #endif

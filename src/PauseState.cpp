@@ -1,6 +1,5 @@
 #include "MenuState.h"
 #include "PauseState.h"
-
 template<> PauseState* Ogre::Singleton<PauseState>::msSingleton = 0;
 
 void

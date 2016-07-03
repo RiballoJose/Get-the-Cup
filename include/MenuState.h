@@ -72,7 +72,12 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   CEGUI::ItemListbox* _size;
   CEGUI::ToggleButton* _full;
   Ogre::OverlayManager* _overlayManager;
-    
+
+  TrackPtr _mainTrack;
+  SoundFXPtr _simpleEffect;
+  TrackManager* _pTrackManager;
+  SoundFXManager* _pSoundFXManager;
+  
   bool _exitGame;
 };
 

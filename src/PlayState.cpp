@@ -1,6 +1,7 @@
 #include "PlayState.h"
 #include "PauseState.h"
 #include "NextLevelState.h"
+#include "EndState.h"
 
 template<> PlayState* Ogre::Singleton<PlayState>::msSingleton = 0;
 
@@ -17,17 +18,24 @@ PlayState::enter ()
   _viewport->setOverlaysEnabled(false);
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
   initLights();
+  _pTrackManager = TrackManager::getSingletonPtr();
+  _pSoundFXManager = SoundFXManager::getSingletonPtr();
+  _mainTrack = _pTrackManager->load("music.ogg");
+  _mainTrack->play();
+  _simpleEffect = _pSoundFXManager->load("aplausos.ogg");
   createScene();
   initBullet();
-  _currentLevel = 1;
+  _currentLevel = 1; _lives = 3;
   loadLevel();
-  _exitGame = _nextLevel = false;
+  _exitGame = _nextLevel = _noLives = _resetLevel = false;
+  
 }
 
 void
 PlayState::exit ()
 {
   _sceneMgr->clearScene();
+  _mainTrack->stop();
   _root->getAutoCreatedWindow()->removeAllViewports();
 }
 
@@ -40,6 +48,7 @@ void
 PlayState::resume()
 {
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
+  resetLevel();
 }
 
 void
@@ -59,22 +68,13 @@ PlayState::initLights()
   _light->setSpotlightOuterAngle(Ogre::Degree(60.0f));
   _light->setSpotlightFalloff(0.0f);
   _light->setCastShadows(true);
-
-  _camera->setPosition(Ogre::Vector3(17, 16, -4));
-  _camera->lookAt(Ogre::Vector3(-3, 2.7, 0));
   _camera->setNearClipDistance(1);
   _camera->setFOVy(Ogre::Degree(38));
 }
 
 void
 PlayState::initBullet()
-{
-
-  Ogre::Vector3 pos = Ogre::Vector3(0,10,5);
-  Ogre::Vector3 dir = Ogre::Vector3(0,0,0);
-
-  int fuerza = 2;
-  
+{ 
   _ball_ent = _sceneMgr->createEntity("ball", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
   _player->attachObject(_ball_ent);
@@ -84,10 +84,8 @@ PlayState::initBullet()
 
   _player_rb->setShape(_player, _ball_sh,
          0.0 /* Restitucion */, 0.6 /* Friccion */,
-         10.0 /* Masa */, pos /* Posicion inicial */,
+         10.0 /* Masa */, Ogre::Vector3(0,10,5)/* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
-
-  //_player_rb->setLinearVelocity(dir * fuerza);
 
   _shapes.push_back(_ball_sh);   _bodies.push_back(_player_rb);
 }
@@ -95,6 +93,7 @@ PlayState::initBullet()
 void
 PlayState::createScene()
 {
+  
   Ogre::SceneNode* node = NULL;
   /* Fisica */
   _debugDrawer = new OgreBulletCollisions::DebugDrawer();
@@ -184,18 +183,32 @@ void PlayState::nextLevel()
 
 void PlayState::resetLevel()
 {
-  _player_rb->getBulletRigidBody()->clearForces();//applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
-  _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
-  _player_rb->getBulletRigidBody()->translate(btVector3(0-_player_rb->getCenterOfMassPosition().x,10-_player_rb->getCenterOfMassPosition().y,5-_player_rb->getCenterOfMassPosition().z));
+  _lives--;
+  if(_lives<1){
+    _noLives = true;
+  }
+  else{
+    _player_rb->getBulletRigidBody()->translate(btVector3(0-_player_rb->getCenterOfMassPosition().x,10-_player_rb->getCenterOfMassPosition().y,5-_player_rb->getCenterOfMassPosition().z));
+    _player_rb->getBulletRigidBody()->clearForces();
+    _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
+    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
+    _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
+    _player_rb->applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
+  }
 }
 void PlayState::removeLevel()
 {
 
 }
 
+void PlayState::died()
+{
+  pushState(EndState::getSingletonPtr());
+}
+
 void PlayState::updatePlayer()
 {
-  double vel = 0.25;
+  double vel = 10.0*_deltaT;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
   bool move = false;
   if(_arriba){
@@ -219,6 +232,7 @@ void PlayState::updatePlayer()
     move = true;
   }
   if(move){
+    //_simpleEffect->play();
     _player_rb->enableActiveState();
     _player_rb->applyImpulse(lv, _player_rb->getCenterOfMassPosition());
   }
@@ -235,6 +249,10 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
+      try{
+	_simpleEffect->play();
+      }
+      catch(...){}
     }
   }
   nodo = NULL;
@@ -245,6 +263,10 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
+      try{
+	_simpleEffect->play();
+      }
+      catch(...){}
     }
   }
   nodo = NULL;
@@ -255,6 +277,10 @@ void PlayState::detectCollisions()
     if(bboxPac.intersects(bboxDot)){
       nodo->removeAndDestroyAllChildren();
       _sceneMgr->destroySceneNode(nodo);
+      try{
+	_simpleEffect->play();
+      }
+      catch(...){}
     }
   }
   nodo = NULL;
@@ -282,8 +308,6 @@ PlayState::frameStarted
   _camera->setPosition(_player->getPosition()+Ogre::Vector3(0, 2.5, 10));
   _camera->lookAt(_player->getPosition().x, _player->getPosition().y+0.5, _player->getPosition().z);
 
-  std::cout  << _player->getPosition().y << std::endl;
-
   return true;
 }
 
@@ -302,7 +326,9 @@ PlayState::frameEnded
 
   if(_player->getPosition().y < -5)
     resetLevel();
-  //std::cout << _player->getPosition().y << std::endl;
+
+  if(_noLives)
+    died();
   if(_jump && _player_rb->getLinearVelocity().y<0.05 && _player->getPosition().y <1.1)
     _jump = false;
   return true;
