@@ -70,6 +70,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void loadLevel();
   void nextLevel();
   void resetLevel();
+  void resetPos();
   void removeLevel();
   void died();
   void createOverlay();

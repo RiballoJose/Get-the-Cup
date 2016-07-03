@@ -300,6 +300,7 @@ void PlayState::loadLevel()
 void PlayState::nextLevel()
 {
   _currentLevel++;
+  resetPos();
   removeLevel();
   pushState(NextLevelState::getSingletonPtr());
   loadLevel();
@@ -312,13 +313,29 @@ void PlayState::resetLevel()
     _noLives = true;
   }
   else{
-    _player_rb->getBulletRigidBody()->translate(btVector3(0-_player_rb->getCenterOfMassPosition().x,10-_player_rb->getCenterOfMassPosition().y,5-_player_rb->getCenterOfMassPosition().z));
-    _player_rb->getBulletRigidBody()->clearForces();
-    _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
-    _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
-    _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
-    _player_rb->applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
+    resetPos();
   }
+}
+void PlayState::resetPos()
+{
+  int x, y, z;
+  switch(_currentLevel){
+  case 1:
+    x = 0; y = 10; z = 5;
+    break;
+  case 2:
+    x = 0; y = 10; z = 7;
+    break;
+  defautl:
+    x = y = z = 0;
+  }
+  
+  _player_rb->getBulletRigidBody()->translate(btVector3(x-_player_rb->getCenterOfMassPosition().x,y-_player_rb->getCenterOfMassPosition().y,z-_player_rb->getCenterOfMassPosition().z));
+  _player_rb->getBulletRigidBody()->clearForces();
+  _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
+  _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
+  _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
+  _player_rb->applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
 }
 void PlayState::removeLevel()
 {
@@ -476,7 +493,7 @@ PlayState::frameEnded
     return false;
 
   if(_nextLevel)
-    nextLevel();
+    nextLevel();_nextLevel=false;
 
   if(_player->getPosition().y < -5)
     resetLevel();
