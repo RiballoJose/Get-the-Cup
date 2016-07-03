@@ -16,6 +16,7 @@ EndState::enter ()
   _simpleEffect->play();
   _exitGame = _save = false;
 
+  _rec = new Record();
     //CEGUI
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().show();
   _sheet = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Menu");
@@ -61,6 +62,14 @@ bool EndState::save(const CEGUI::EventArgs &e)
 {
   //_help->hide();
   //CEGUI::string name = nick->getText();
+  RecordManager::getSingletonPtr()->loadRecords();
+  if(_score<0)
+    _rec->setPunt(0);
+  else
+    _rec->setPunt(_score);
+  _rec->setPlayer(_nick->getText().c_str());
+  RecordManager::getSingletonPtr()->addRecord(*_rec);
+  RecordManager::getSingletonPtr()->saveRecords();
   _save=true;
   return true;
 }

@@ -1,5 +1,6 @@
 #include "MenuState.h"
 #include "PlayState.h"
+#include "RecordManager.h"
 
 template<> MenuState* Ogre::Singleton<MenuState>::msSingleton = 0;
 
@@ -107,6 +108,27 @@ bool MenuState::help(const CEGUI::EventArgs &e)
 }
 bool MenuState::records(const CEGUI::EventArgs &e)
 {
+  RecordManager::getSingletonPtr()->loadRecords();
+  CEGUI::Window* configWin = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("records.layout");
+  _recordWin = CEGUI::WindowManager::getSingleton().createWindow("DefaultWindow","Records");
+  //_records = (CEGUI::ItemListbox *)configWin->getChild("RecListbox");
+  std::stringstream aux, item;
+  int i = 0;
+  item << "Item";
+  for (std::map<int, Record>::iterator it = RecordManager::getSingletonPtr()->_records.begin(); 
+       it != RecordManager::getSingletonPtr()->_records.end() && i <9; ++it){
+    i++;
+    aux << it->second.toString() << "\n";
+    item << i;
+    configWin->getChild(item.str())->setText(aux.str());
+    item.clear();item.str("");item << "Item";
+    aux.clear(); aux.str("");
+  }
+  CEGUI::Window* exitButton = configWin->getChild("ExitButton");
+  exitButton->subscribeEvent(CEGUI::PushButton::EventClicked,
+  CEGUI::Event::Subscriber(&MenuState::back, this));
+  _recordWin->addChild(configWin);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_recordWin);
   return true;
 }
 bool MenuState::cfg(const CEGUI::EventArgs &e)

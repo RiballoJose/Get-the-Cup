@@ -68,8 +68,8 @@ class MenuState : public Ogre::Singleton<MenuState>, public GameState
   Ogre::Viewport* _viewport;
   Ogre::Camera* _camera;
   
-  CEGUI::Window* _menu,* _cfg;
-  CEGUI::ItemListbox* _size;
+  CEGUI::Window* _menu,* _cfg, *_recordWin;
+  CEGUI::ItemListbox* _size, *_records;
   CEGUI::ToggleButton* _full;
   Ogre::OverlayManager* _overlayManager;
 

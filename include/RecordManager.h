@@ -13,6 +13,9 @@
 
 class RecordManager: public Ogre::Singleton<RecordManager>{
  public:
+  
+  std::map <int, Record> _records;
+  
   RecordManager();
   ~RecordManager();
 
@@ -28,7 +31,6 @@ class RecordManager: public Ogre::Singleton<RecordManager>{
   static RecordManager* getSingletonPtr ();
  private:
   std::string _docName;
-  std::map <int, Record> _records;
 };
 
 #endif

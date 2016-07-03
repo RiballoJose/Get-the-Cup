@@ -43,7 +43,8 @@ class EndState : public Ogre::Singleton<EndState>, public GameState{
 
   CEGUI::Window* _sheet;
   CEGUI::Window* _nick;
-  
+  Record *_rec;
+  std::string _scoreStr, _nickname;
   SoundFXPtr _simpleEffect;
   SoundFXManager* _pSoundFXManager;
         

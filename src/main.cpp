@@ -21,6 +21,7 @@
 #define UNUSED_VARIABLE(x) (void)x
 
 #include "GameManager.h"
+#include "RecordManager.h"
 #include "IntroState.h"
 #include "MenuState.h"
 #include "PlayState.h"
@@ -35,6 +36,7 @@ using namespace std;
 int main () {
 
   GameManager* game = new GameManager();
+  RecordManager* recordManager = new RecordManager();
   IntroState* introState = new IntroState();
   MenuState* menuState = new MenuState();
   PlayState* playState = new PlayState();
@@ -43,6 +45,7 @@ int main () {
   EndState* endState = new EndState();
 
   UNUSED_VARIABLE(introState);
+  UNUSED_VARIABLE(recordManager);
   UNUSED_VARIABLE(menuState);
   UNUSED_VARIABLE(playState);
   UNUSED_VARIABLE(nextLevelState);

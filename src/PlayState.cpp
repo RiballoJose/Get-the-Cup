@@ -246,7 +246,7 @@ void PlayState::removeLevel()
 void PlayState::died()
 {
   std::cout << _score << std::endl;
-  EndState::getSingletonPtr()->addScore(_score);
+  EndState::getSingletonPtr()->addScore(_score-_time);
   pushState(EndState::getSingletonPtr());
 }
 

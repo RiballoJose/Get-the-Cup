@@ -43,8 +43,8 @@ Record::toString()
 {
   std::stringstream aux;
 
-  aux << _pos << ".\t\t\t\t\t\t"
-      << _player << "\t\t\t\t\t\t";
+  aux << _pos << ".  "
+      << _player << " -> ";
 
   if(_punt < 100){
     aux << "0";
