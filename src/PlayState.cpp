@@ -300,9 +300,9 @@ void PlayState::loadLevel()
 void PlayState::nextLevel()
 {
   _currentLevel++;
-  resetPos();
   removeLevel();
   pushState(NextLevelState::getSingletonPtr());
+  resetPos();
   loadLevel();
 }
 
@@ -329,7 +329,6 @@ void PlayState::resetPos()
   default:
     x = y = z = 0;
   }
-  
   _player_rb->getBulletRigidBody()->translate(btVector3(x-_player_rb->getCenterOfMassPosition().x,y-_player_rb->getCenterOfMassPosition().y,z-_player_rb->getCenterOfMassPosition().z));
   _player_rb->getBulletRigidBody()->clearForces();
   _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
@@ -408,7 +407,7 @@ void PlayState::updatePlayer()
     _player_rb->enableActiveState();
     _player_rb->getBulletRigidBody()->setLinearVelocity
       (btVector3(_player_rb->getLinearVelocity().x,
-		 40*vel, _player_rb->getLinearVelocity().z));
+		 30*vel, _player_rb->getLinearVelocity().z));
   }
   if(move){
     //_simpleEffect->play();
