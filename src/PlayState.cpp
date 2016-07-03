@@ -135,7 +135,6 @@ void PlayState::loadLevel()
     _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
 
     ent_l1 =  _sceneMgr->createEntity("Hall1.mesh");
-    ent_l1->setMaterialName("Level");
     nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l12", Ogre::Vector3(0,0,-7));
     nodo_l1->attachObject(ent_l1);
     trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
