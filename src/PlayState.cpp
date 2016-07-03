@@ -19,6 +19,8 @@ PlayState::enter ()
 
   _currentLevel = 1; _lives = 3; _stops = 0; _score = 0; _time = 0;
   _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = false;
+
+  _level = _sceneMgr -> getRootSceneNode() -> createChildSceneNode();
   
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
   initLights();
@@ -164,55 +166,135 @@ PlayState::createScene()
 void PlayState::loadLevel()
 {
   std::stringstream blq; blq.str("");
-  if(_currentLevel==1){
-    Ogre::Entity* ent_l1 =  _sceneMgr->createEntity("Plat_big.mesh");
-    Ogre::SceneNode* nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l11", Ogre::Vector3(0,0,-17));
-    nodo_l1->attachObject(ent_l1);
-    OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
-    OgreBulletCollisions::CollisionShape *level1_sh = trimeshConverter->createConvex();
-    OgreBulletDynamics::RigidBody *level1_rb = new OgreBulletDynamics::RigidBody("l11", _world);
-    level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-17), Ogre::Quaternion::IDENTITY);
-    level1_rb->setGravity(0.0,0.0,0.0);
-    level1_rb->setKinematicObject(true);
-    _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
+  Ogre::Entity* ent = NULL;
+  Ogre::SceneNode* nodo = NULL;
+  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL;
+  OgreBulletCollisions::CollisionShape *level_sh = NULL;
+  OgreBulletDynamics::RigidBody *level_rb = NULL;
+  switch(_currentLevel){
+  case 1:
+    ent =  _sceneMgr->createEntity("Plat_big.mesh");
+    nodo = _level->createChildSceneNode("l11", Ogre::Vector3(0,0,-17));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l11", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-17), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
 
-    ent_l1 =  _sceneMgr->createEntity("Hall1.mesh");
-    nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l12", Ogre::Vector3(0,0,-7));
-    nodo_l1->attachObject(ent_l1);
-    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
-    level1_sh = trimeshConverter->createConvex();
-    level1_rb = new OgreBulletDynamics::RigidBody("l12", _world);
-    level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-7), Ogre::Quaternion::IDENTITY);
-    level1_rb->setGravity(0.0,0.0,0.0);
-    level1_rb->setKinematicObject(true);
-    _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
+    ent =  _sceneMgr->createEntity("Hall1.mesh");
+    nodo = _level->createChildSceneNode("l12", Ogre::Vector3(0,0,-7));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l12", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-7), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
 
-    ent_l1 =  _sceneMgr->createEntity("Plat_big.mesh");
-    nodo_l1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("l13", Ogre::Vector3(0,0,3));
-    nodo_l1->attachObject(ent_l1);
-    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent_l1);
-    level1_sh = trimeshConverter->createConvex();
-    level1_rb = new OgreBulletDynamics::RigidBody("l13", _world);
-    level1_rb->setStaticShape(nodo_l1, level1_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,3), Ogre::Quaternion::IDENTITY);
-    level1_rb->setGravity(0.0,0.0,0.0);
-    level1_rb->setKinematicObject(true);
-    _shapes.push_back(level1_sh);   _bodies.push_back(level1_rb);
+    ent =  _sceneMgr->createEntity("Plat_big.mesh");
+    nodo = _level->createChildSceneNode("l13", Ogre::Vector3(0,0,3));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l13", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,3), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
 
-   Ogre::SceneNode* l1_n1 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
-    Ogre::Entity* l1_e1 =  _sceneMgr->createEntity("Cup.mesh");
-    l1_n1->attachObject(l1_e1);
-    _cups.push_back(l1_n1);
-    Ogre::SceneNode* l1_n2 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
-    Ogre::Entity* l1_e2 =  _sceneMgr->createEntity("Cup.mesh");
-    l1_n2->attachObject(l1_e2);
-    _cups.push_back(l1_n2);
-    Ogre::SceneNode* l1_n3 = _sceneMgr->getRootSceneNode()->createChildSceneNode("Cup1_3", Ogre::Vector3(3,1.5,-12.5));
-    Ogre::Entity* l1_e3 =  _sceneMgr->createEntity("Cup.mesh");
-    l1_n3->attachObject(l1_e3);
-    _cups.push_back(l1_n3);
+    nodo = _level->createChildSceneNode("Cup1_1", Ogre::Vector3(0,1.5,-8.5));
+    ent =  _sceneMgr->createEntity("Cup.mesh");
+    nodo->attachObject(ent);
+    _cups.push_back(nodo);
+    nodo = _level->createChildSceneNode("Cup1_2", Ogre::Vector3(-3,1.5,-12.5));
+    ent =  _sceneMgr->createEntity("Cup.mesh");
+    nodo->attachObject(ent);
+    _cups.push_back(nodo);
+    nodo = _level->createChildSceneNode("Cup1_3", Ogre::Vector3(3,1.5,-12.5));
+    ent =  _sceneMgr->createEntity("Cup.mesh");
+    nodo->attachObject(ent);
+    _cups.push_back(nodo);
     
     _meta_n->setPosition(0,1.5,-18.5);
     _stops = 1;
+    break;
+  case 2:
+    ent =  _sceneMgr->createEntity("Plat_big.mesh");
+    nodo = _level->createChildSceneNode("l21", Ogre::Vector3(0,0,3));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l21", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,3), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
+
+    ent =  _sceneMgr->createEntity("Ramp2.mesh");
+    nodo = _level->createChildSceneNode("l22", Ogre::Vector3(0,0.75,-4.1));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l22", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0.75,-4.1), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
+
+    ent =  _sceneMgr->createEntity("Plat_big.mesh");
+    nodo = _level->createChildSceneNode("l23", Ogre::Vector3(0,0,-18.1));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l23", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-18.1), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
+
+    ent =  _sceneMgr->createEntity("Ramp2.mesh");
+    nodo = _level->createChildSceneNode("l24", Ogre::Vector3(0,0.75,-25.1));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l24", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0.75,-25.1), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
+
+    ent =  _sceneMgr->createEntity("Plat_big.mesh");
+    nodo = _level->createChildSceneNode("l25", Ogre::Vector3(0,0,-38.1));
+    nodo->attachObject(ent);
+    trimeshConverter = new OgreBulletCollisions::StaticMeshToShapeConverter(ent);
+    level_sh = trimeshConverter->createConvex();
+    level_rb = new OgreBulletDynamics::RigidBody("l25", _world);
+    level_rb->setStaticShape(nodo, level_sh, 0.6, 1.0 , /*5.0,*/ Ogre::Vector3(0,0,-38.1), Ogre::Quaternion::IDENTITY);
+    level_rb->setGravity(0.0,0.0,0.0);
+    level_rb->setKinematicObject(true);
+    _shapes.push_back(level_sh);   _bodies.push_back(level_rb);
+
+
+    nodo = _level->createChildSceneNode("Cup2_1", Ogre::Vector3(0,3,-8.5));
+    ent =  _sceneMgr->createEntity("Cup.mesh");
+    nodo->attachObject(ent);
+    _cups.push_back(nodo);
+    nodo = _level->createChildSceneNode("Cup2_2", Ogre::Vector3(-3,1.5,-18.1));
+    ent =  _sceneMgr->createEntity("Cup.mesh");
+    nodo->attachObject(ent);
+    _cups.push_back(nodo);
+    nodo = _level->createChildSceneNode("Cup2_3", Ogre::Vector3(0,1.5,-38.1));
+    ent =  _sceneMgr->createEntity("Cup.mesh");
+    nodo->attachObject(ent);
+    _cups.push_back(nodo);
+    
+    _meta_n->setPosition(0,1.5,-43.5);
+    _stops = 1;
+    break;
   }
 }
 void PlayState::nextLevel()
@@ -240,7 +322,20 @@ void PlayState::resetLevel()
 }
 void PlayState::removeLevel()
 {
+  destroyAllAttachedMovableObjects(_level);
+}
 
+void
+PlayState::destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
+{
+   if(!node) return;
+
+   Ogre::SceneNode::ChildNodeIterator itChild = node->getChildIterator();
+
+   while (itChild.hasMoreElements()){
+      Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
+      destroyAllAttachedMovableObjects(pChildNode);
+   }
 }
 
 void PlayState::died()
@@ -338,14 +433,14 @@ void PlayState::detectCollisions()
     }
   }
   nodo = NULL;
-/*  try{nodo = _sceneMgr->getSceneNode("Meta");}catch(...){}
+ try{nodo = _sceneMgr->getSceneNode("Meta");}catch(...){}
   if(nodo){
     Ogre::AxisAlignedBox bboxPac = _player->_getWorldAABB();
     Ogre::AxisAlignedBox bboxDot = nodo->_getWorldAABB();
     if(bboxPac.intersects(bboxDot)){
       _nextLevel = true;
     }
-  }*/
+  }
 }
 
 bool

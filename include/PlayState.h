@@ -73,6 +73,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void removeLevel();
   void died();
   void createOverlay();
+  void destroyAllAttachedMovableObjects(Ogre::SceneNode* node);
+
   
  protected:
   Ogre::Root* _root;
