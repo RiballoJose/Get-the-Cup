@@ -70,6 +70,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   void detectCollisions();
   void loadLevel();
   void nextLevel();
+  void resetLevel();
   void removeLevel();
 
  protected:
@@ -96,7 +97,8 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::SceneNode* _meta_n;
   Ogre::Entity* _meta_e;
   std::deque <Ogre::SceneNode*> _cups;
-  
+  Ogre::Entity* _ball_ent;
+  OgreBulletCollisions::SphereCollisionShape *_ball_sh;
   OgreBulletDynamics::RigidBody *_player_rb;
   int _currentLevel;
   bool _nextLevel, _exitGame;

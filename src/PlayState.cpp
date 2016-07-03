@@ -75,27 +75,21 @@ PlayState::initBullet()
 
   int fuerza = 2;
   
-  Ogre::Entity* entity = _sceneMgr->createEntity("ball", "Player.mesh");
+  _ball_ent = _sceneMgr->createEntity("ball", "Player.mesh");
   _player = _sceneMgr->getRootSceneNode()->createChildSceneNode();
-  _player->attachObject(entity);
+  _player->attachObject(_ball_ent);
 
-  OgreBulletCollisions::StaticMeshToShapeConverter *trimeshConverter = NULL; 
-  OgreBulletCollisions::CollisionShape *bodyShape = NULL;
-
-  trimeshConverter = new 
-    OgreBulletCollisions::StaticMeshToShapeConverter(entity);
-  bodyShape = trimeshConverter->createConvex();
-
+  _ball_sh = new OgreBulletCollisions::SphereCollisionShape(Ogre::Real(0.375));
   _player_rb = new OgreBulletDynamics::RigidBody("rigidBody", _world);
 
-  _player_rb->setShape(_player, bodyShape,
-         0.6 /* Restitucion */, 0.6 /* Friccion */,
+  _player_rb->setShape(_player, _ball_sh,
+         0.0 /* Restitucion */, 0.6 /* Friccion */,
          10.0 /* Masa */, pos /* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
   //_player_rb->setLinearVelocity(dir * fuerza);
 
-  _shapes.push_back(bodyShape);   _bodies.push_back(_player_rb);
+  _shapes.push_back(_ball_sh);   _bodies.push_back(_player_rb);
 }
 
 void
@@ -179,7 +173,6 @@ void PlayState::loadLevel()
     
     _meta_n->setPosition(0,1.5,-18.5);
   }
-  _player->setPosition(0,10,5);
 }
 void PlayState::nextLevel()
 {
@@ -189,6 +182,12 @@ void PlayState::nextLevel()
   loadLevel();
 }
 
+void PlayState::resetLevel()
+{
+  _player_rb->getBulletRigidBody()->clearForces();//applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
+  _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
+  _player_rb->getBulletRigidBody()->translate(btVector3(0-_player_rb->getCenterOfMassPosition().x,10-_player_rb->getCenterOfMassPosition().y,5-_player_rb->getCenterOfMassPosition().z));
+}
 void PlayState::removeLevel()
 {
 
@@ -300,7 +299,9 @@ PlayState::frameEnded
 
   if(_nextLevel)
     nextLevel();
-  
+
+  if(_player->getPosition().y < -5)
+    resetLevel();
   //std::cout << _player->getPosition().y << std::endl;
   if(_jump && _player_rb->getLinearVelocity().y<0.05 && _player->getPosition().y <1.1)
     _jump = false;
