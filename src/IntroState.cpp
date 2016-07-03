@@ -1,5 +1,6 @@
 #include "IntroState.h"
 #include "MenuState.h"
+#include <RendererModules/Ogre/Renderer.h>
 
 template<> IntroState* Ogre::Singleton<IntroState>::msSingleton = 0;
 
@@ -13,6 +14,25 @@ IntroState::enter ()
   _viewport = _root->getAutoCreatedWindow()->addViewport(_camera);
   createGUI();
   _exitGame = false;
+
+  Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().create("Background", "General");
+  material->getTechnique(0)->getPass(0)->createTextureUnitState("preview.jpg");
+  material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
+  material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
+  material->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+
+  Ogre::Rectangle2D* rect = new Ogre::Rectangle2D(true);
+  rect->setCorners(-1.0, 1.0, 1.0, -1.0);
+  rect->setMaterial("Background");
+
+  rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
+
+  Ogre::AxisAlignedBox aabInf;
+  aabInf.setInfinite();
+  rect->setBoundingBox(aabInf);
+
+  Ogre::SceneNode* node = _sceneMgr->getRootSceneNode()->createChildSceneNode("BackgroundMenu");
+  node->attachObject(rect);
 }
 
 void

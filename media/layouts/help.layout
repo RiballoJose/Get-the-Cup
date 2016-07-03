@@ -28,7 +28,7 @@
       <Property name="Area" value="{{0.1,0},{0.74,0},{0.9,0},{0.81,0}}" />
     </Window>
     <Window type="TaharezLook/StaticText" name="SpaceText" >
-      <Property name="Text" value="Barra espaciadora (space) = salta." />
+      <Property name="Text" value="Mayus izq (bonus) = detiene la pelota" />
       <Property name="Area" value="{{0.1,0},{0.82,0},{0.75,0},{0.89,0}}" />
     </Window>
     <Window type="TaharezLook/StaticText" name="PauseText" >

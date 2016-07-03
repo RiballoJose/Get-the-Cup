@@ -1,6 +1,7 @@
 #include "MenuState.h"
 #include "PlayState.h"
 #include "RecordManager.h"
+#include <RendererModules/Ogre/Renderer.h>
 
 template<> MenuState* Ogre::Singleton<MenuState>::msSingleton = 0;
 
@@ -20,6 +21,25 @@ MenuState::enter ()
   _pSoundFXManager = SoundFXManager::getSingletonPtr();
   _mainTrack = _pTrackManager->load("menu.ogg");
   _mainTrack->play();
+  
+  Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().create("Background2", "General");
+  material->getTechnique(0)->getPass(0)->createTextureUnitState("2173.jpg");
+  material->getTechnique(0)->getPass(0)->setDepthCheckEnabled(false);
+  material->getTechnique(0)->getPass(0)->setDepthWriteEnabled(false);
+  material->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+
+  Ogre::Rectangle2D* rect = new Ogre::Rectangle2D(true);
+  rect->setCorners(-1.0, 1.0, 1.0, -1.0);
+  rect->setMaterial("Background2");
+
+  rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
+
+  Ogre::AxisAlignedBox aabInf;
+  aabInf.setInfinite();
+  rect->setBoundingBox(aabInf);
+
+  Ogre::SceneNode* node = _sceneMgr->getRootSceneNode()->createChildSceneNode("BackgroundMenu");
+  node->attachObject(rect);
   
   createGUI();
   
