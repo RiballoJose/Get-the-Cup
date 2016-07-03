@@ -18,7 +18,7 @@ PlayState::enter ()
   _viewport->setOverlaysEnabled(false);
 
   _currentLevel = 1; _lives = 3; _stops = 0; _score = 0; _time = 0;
-  _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = false;
+  _exitGame = _nextLevel = _noLives = _resetLevel = _stopBall = _jumping =  false;
 
   _level = _sceneMgr -> getRootSceneNode() -> createChildSceneNode();
   
@@ -326,7 +326,7 @@ void PlayState::resetPos()
   case 2:
     x = 0; y = 10; z = 7;
     break;
-  defautl:
+  default:
     x = y = z = 0;
   }
   
@@ -389,9 +389,14 @@ void PlayState::updatePlayer()
     lv+=Ogre::Vector3(1*vel,0,0);
     move = true;
   }
-  if(_salto && _player_rb->getCenterOfMassPosition().y < 1.5){
-    lv+=Ogre::Vector3(0,0.5*vel,0);
-    move = true;
+  if(_jumping && _player_rb->getLinearVelocity().y<_deltaT && _player_rb->getLinearVelocity().y>-_deltaT)
+    _jumping=false;
+  if(_salto && !_jumping){
+    _jumping = true;
+    _player_rb->enableActiveState();
+    _player_rb->getBulletRigidBody()->setLinearVelocity
+      (btVector3(_player_rb->getLinearVelocity().x,
+		 40*vel, _player_rb->getLinearVelocity().z));
   }
   if(move){
     //_simpleEffect->play();
@@ -514,7 +519,7 @@ PlayState::keyPressed
     pushState(PauseState::getSingletonPtr());
     break;
   case OIS::KC_SPACE:
-    _salto=true;
+    _salto=true;_jumping = true;
     break;
   case OIS::KC_S:
     _abajo = true;
