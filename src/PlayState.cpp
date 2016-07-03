@@ -122,8 +122,8 @@ PlayState::initBullet()
   _player_rb = new OgreBulletDynamics::RigidBody("rigidBody", _world);
 
   _player_rb->setShape(_player, _ball_sh,
-         0.0 /* Restitucion */, 0.6 /* Friccion */,
-         10.0 /* Masa */, Ogre::Vector3(0,10,5)/* Posicion inicial */,
+         0.0 /* Restitucion */, 0.5 /* Friccion */,
+         7.0 /* Masa */, Ogre::Vector3(0,10,5)/* Posicion inicial */,
          Ogre::Quaternion::IDENTITY /* Orientacion */);
 
   _shapes.push_back(_ball_sh);   _bodies.push_back(_player_rb);
@@ -369,8 +369,8 @@ void PlayState::updatePlayer()
     _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
     _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
     _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
-  }
-  double vel = 10.0*_deltaT;
+
+  double vel = 15.0*_deltaT;
   Ogre::Vector3 lv = Ogre::Vector3::ZERO;
   bool move = false;
   if(_arriba){
@@ -378,7 +378,7 @@ void PlayState::updatePlayer()
     move = true;
   }
   if(_abajo){
-    lv+=Ogre::Vector3(0,0,1*vel);
+    lv+=Ogre::Vector3(0,0,1.25*vel);
     move = true;
   }
   if(_izquierda){
