@@ -109,7 +109,12 @@ PlayState::createOverlay()
   _timeWin = configWin3->getChild("Time");
   _sheet->addChild(configWin3);
   CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
-  _timeWin->setText(Ogre::StringConverter::toString(_time));
+
+  CEGUI::Window* configWin4 = CEGUI::WindowManager::getSingleton().loadLayoutFromFile("stops.layout");
+  _stopsWin = configWin4->getChild("Stops");
+  _sheet->addChild(configWin4);
+  CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
+  _stopsWin->setText(Ogre::StringConverter::toString(_stops));
 }
 
 void
@@ -223,6 +228,7 @@ void PlayState::loadLevel()
     
     _meta_n->setPosition(0,1.5,-18.5);
     _stops = 1;
+    _stopsWin->setText(Ogre::StringConverter::toString(_stops));
     break;
   case 2:
     ent =  _sceneMgr->createEntity("Plat_big.mesh");
@@ -294,7 +300,8 @@ void PlayState::loadLevel()
     _cups.push_back(nodo);
     
     _meta_n->setPosition(0,1.5,-43.5);
-    _stops = 1;
+    _stops = 2;
+    _stopsWin->setText(Ogre::StringConverter::toString(_stops));
     break;
   }
 }
@@ -555,7 +562,9 @@ PlayState::keyPressed
     break;
   case OIS::KC_LSHIFT:
     if(_stops>0){
-      _stops--; _stopBall = true;
+      _stops--;
+      _stopsWin->setText(Ogre::StringConverter::toString(_stops));
+      _stopBall = true;
     }
     break;
   default:
