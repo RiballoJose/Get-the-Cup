@@ -2,6 +2,7 @@
 #include "PauseState.h"
 #include "NextLevelState.h"
 #include "EndState.h"
+#include "WinState.h"
 
 template<> PlayState* Ogre::Singleton<PlayState>::msSingleton = 0;
 
@@ -55,6 +56,7 @@ PlayState::pause()
 void
 PlayState::resume()
 {
+  resetPos();
   _sheet->show();
   CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow(_sheet);
   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().hide();
@@ -483,17 +485,22 @@ void PlayState::loadLevel()
     _cups.push_back(nodo);
     
     _meta_n->setPosition(0,6.25,-29);
-    _stops = 1;
+    _stops = 2;
     break;
     }
 }
 void PlayState::nextLevel()
 {
   _currentLevel++;
-  removeLevel();
-  pushState(NextLevelState::getSingletonPtr());
-  resetPos();
-  loadLevel();
+  if(_currentLevel==5){
+    end();
+  }
+  else{
+    removeLevel();
+    pushState(NextLevelState::getSingletonPtr());
+    resetPos();
+    loadLevel();
+  }
 }
 
 void PlayState::resetLevel()
@@ -517,7 +524,7 @@ void PlayState::resetPos()
     x = 0; y = 10; z = 7;
     break;
   case 3:
-    x = 0; y = 10; z = 7;
+    x = 0; y = 10; z = 5;
     break;
   case 4:
     x= 0; y = 5; z = 3;
@@ -525,12 +532,13 @@ void PlayState::resetPos()
   /*default:
     x = 0; y = z = 5;*/
   }
+  _derecha = _izquierda = _arriba = _abajo = false;
   _player_rb->getBulletRigidBody()->translate(btVector3(x-_player_rb->getCenterOfMassPosition().x,y-_player_rb->getCenterOfMassPosition().y,z-_player_rb->getCenterOfMassPosition().z));
+  _player_rb->applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
   _player_rb->getBulletRigidBody()->clearForces();
   _player_rb->setLinearVelocity(Ogre::Vector3(0,0,0));
   _player_rb->getBulletRigidBody()->setAngularVelocity(btVector3(0,0,0));
   _player_rb->getBulletRigidBody()->setLinearVelocity(btVector3(0,0,0));
-  _player_rb->applyForce(Ogre::Vector3::ZERO, _player_rb->getCenterOfMassPosition());
 }
 void PlayState::removeLevel()
 {
@@ -592,11 +600,14 @@ PlayState::destroyAllAttachedMovableObjects(Ogre::SceneNode* node)
 
 void PlayState::died()
 {
-  std::cout << _score << std::endl;
   EndState::getSingletonPtr()->addScore(_score-_time);
   pushState(EndState::getSingletonPtr());
 }
-
+void PlayState::end()
+{
+  WinState::getSingletonPtr()->addScore(_score-_time);
+  pushState(WinState::getSingletonPtr());
+}
 void PlayState::updatePlayer()
 {
   if(_stopBall){

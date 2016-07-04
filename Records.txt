@@ -1,6 +1,6 @@
-1:dario:222
-2:jose:137
-3:jose:133
-4:default_name:129
-5:default_name:121
-6:default_name:87
+1:default_name:449
+2:record:418
+3:solucionado!:377
+4:victoria:292
+5:dario:222
+6:default_name:212

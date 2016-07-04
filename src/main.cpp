@@ -28,6 +28,7 @@
 #include "NextLevelState.h"
 #include "PauseState.h"
 #include "EndState.h"
+#include "WinState.h"
 
 #include <iostream>
 
@@ -43,6 +44,7 @@ int main () {
   NextLevelState* nextLevelState = new NextLevelState();
   PauseState* pauseState = new PauseState();
   EndState* endState = new EndState();
+  WinState* winState = new WinState();
 
   UNUSED_VARIABLE(introState);
   UNUSED_VARIABLE(recordManager);
@@ -51,6 +53,7 @@ int main () {
   UNUSED_VARIABLE(nextLevelState);
   UNUSED_VARIABLE(pauseState);
   UNUSED_VARIABLE(endState);
+  UNUSED_VARIABLE(winState);
     
   try
     {
