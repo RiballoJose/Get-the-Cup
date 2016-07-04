@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout version="4">
+  <Window type="TaharezLook/FrameWindow" name="Menu" >
+    <Property name="Text" value="Menu" />
+    <Property name="TitlebarFont" value="DejaVuSans-12" />
+    <Property name="TitlebarEnabled" value="True" />
+    <Property name="Area" value="{{0.25,0},{0.2,0},{0.75,0},{0.8,0}}" />
+    <Window type="TaharezLook/StaticText" name="GameOver" >
+      <Property name="Text" value="                     YOU WIN!." />
+      <Property name="Area" value="{{0.25,0},{0.1,0},{0.75,0},{0.2,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="NickText" >
+      <Property name="Text" value="         Nick->" />
+      <Property name="Area" value="{{0.25,0},{0.3,0},{0.475,0},{0.4,0}}" />
+    </Window>
+    <Window type="TaharezLook/Editbox" name="Nick" >
+      <Property name="Text" value="default_name" />
+      <Property name="MaxTextLength" value="14" />
+      <Property name="Area" value="{{0.525,0},{0.3,0},{0.75,0},{0.4,0}}" />
+      <Property name="TextParsingEnabled" value="False" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="MarkText" >
+      <Property name="Text" value="  Puntuación->" />
+      <Property name="Area" value="{{0.25,0},{0.5,0},{0.475,0},{0.6,0}}" />
+    </Window>
+    <Window type="TaharezLook/StaticText" name="MarkValue" >
+      <Property name="Text" value="" />
+      <Property name="Area" value="{{0.525,0},{0.5,0},{0.75,0},{0.6,0}}" />
+    </Window>
+    <Window type="TaharezLook/Button" name="MenuButton" >
+      <Property name="Text" value="Save mark" />
+      <Property name="Area" value="{{0.25,0},{0.7,0},{0.75,0},{0.8,0}}" />
+    </Window>
+    <!-- Exit button -->
+    <Window type="TaharezLook/Button" name="ExitButton" >
+      <Property name="Text" value="Exit" />
+      <Property name="Area" value="{{0.25,0},{0.8,0},{0.75,0},{0.9,0}}" />
+    </Window>
+  </Window>
+</GUILayout>
