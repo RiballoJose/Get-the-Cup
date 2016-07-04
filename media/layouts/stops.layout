@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GUILayout version="4">
+  <Window type="TaharezLook/FrameWindow" name="stops_win" >
+    <Property name="Text" value="Stops" />
+    <Property name="TitlebarFont" value="DejaVuSans-12" />
+    <Property name="TitlebarEnabled" value="True" />
+    <Property name="Area" value="{{0.05,0},{0.45,0},{0.15,0},{0.55,0}}" />
+    <Window type="TaharezLook/StaticText" name="Stops" >
+      <Property name="Text" value="" />
+      <Property name="Area" value="{{0.1,0},{0.1,0},{0.9,0},{0.9,0}}" />
+    </Window>
+  </Window>
+</GUILayout>
