@@ -111,7 +111,7 @@ class PlayState : public Ogre::Singleton<PlayState>, public GameState
   Ogre::Overlay *_ovJuego;
   Ogre::OverlayElement *_ovPunt, *_ovVida, *_ovScore;
 
-  CEGUI::Window* _sheet,*_scoreWin, *_livesWin, *_timeWin;
+  CEGUI::Window* _sheet,*_scoreWin, *_livesWin, *_timeWin, *_stopsWin;
 
   TrackPtr _mainTrack;
   SoundFXPtr _simpleEffect;
